@@ -1272,6 +1272,11 @@ case "${targ}" in
     targ_selvecs="$targ_selvecs sh_coff_vec sh_coff_le_vec sh_coff_small_vec sh_coff_small_le_vec"
     targ_underscore=yes
     ;;
+  sh*-*-vhex*)
+    targ_defvec=sh_elf32_vec
+    targ_selvecs="sh_elf32_vec"
+    targ_underscore=yes
+    ;;
   sh-*-*)
     targ_defvec=sh_coff_vec
     targ_selvecs="sh_coff_vec sh_coff_le_vec sh_coff_small_vec sh_coff_small_le_vec"

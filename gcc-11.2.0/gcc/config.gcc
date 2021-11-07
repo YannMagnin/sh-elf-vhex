@@ -3204,7 +3204,9 @@ s390x-ibm-tpf*)
 	;;
 sh-*-elf* | sh[12346l]*-*-elf* | \
   sh-*-linux* | sh[2346lbe]*-*-linux* | \
-  sh-*-netbsdelf* | shl*-*-netbsdelf*)
+  sh-*-netbsdelf* | shl*-*-netbsdelf* | \
+  sh*-*-vhex*)
+
 	tmake_file="${tmake_file} sh/t-sh sh/t-elf"
 	if test x${with_endian} = x; then
 		case ${target} in
@@ -3214,6 +3216,7 @@ sh-*-elf* | sh[12346l]*-*-elf* | \
 		shl* | sh*-*-linux* | \
 		  sh-superh-elf)		   with_endian=little,big ;;
 		sh[1234]*-*-*)			   with_endian=big ;;
+		sh*-*-vhex*)			   with_endian=big ;;
 		*)				   with_endian=big,little ;;
 		esac
 	fi
@@ -3266,7 +3269,8 @@ sh-*-elf* | sh[12346l]*-*-elf* | \
 	case `echo ${target} | sed 's/e[lb]-/-/'` in
 	sh4a_single_only*)	sh_cpu_target=sh4a-single-only ;;
 	sh4a_single*)		sh_cpu_target=sh4a-single ;;
-	sh4a_nofpu*)		sh_cpu_target=sh4a-nofpu ;;
+	sh-*-vhex* | sh4a_nofpu*)
+				sh_cpu_target=sh4a-nofpu ;;
 	sh4al)			sh_cpu_target=sh4al ;;
 	sh4a*)			sh_cpu_target=sh4a ;;
 	sh4_single_only*)	sh_cpu_target=sh4-single-only ;;

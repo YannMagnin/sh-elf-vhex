@@ -1358,6 +1358,9 @@ sh-*-rtems*)
 		libic_invalidate_array_4a.a \
 		libgcc-Os-4-200.a libgcc-4-300.a"
 	;;
+sh*-*-vhex*)
+	tmake_file="${tmake_file} sh/t-sh t-slibgcc-libgcc t-libgcc-pic"
+	;;
 sh-wrs-vxworks)
 	tmake_file="$tmake_file sh/t-sh t-crtstuff-pic t-fdpbit"
 	;;

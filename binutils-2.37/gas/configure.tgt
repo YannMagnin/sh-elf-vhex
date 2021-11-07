@@ -386,6 +386,7 @@ case ${generic_target} in
   sh-*-pe*)				fmt=coff em=pe endian=little ;;
   sh-*-kaos*)				fmt=elf ;;
   shle*-*-kaos*)			fmt=elf ;;
+  sh*-*-vhex*)                          fmt=elf ;;
 
   sparc-*-linux-*)			fmt=elf em=linux ;;
   sparc-*-solaris*)			fmt=elf em=solaris ;;
