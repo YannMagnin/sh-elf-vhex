@@ -3252,6 +3252,7 @@ sh-*-elf* | sh[12346l]*-*-elf* | \
 			tm_file="${tm_file} sh/embed-elf.h"
 			tm_file="${tm_file} sh/superh.h"
 			extra_options="${extra_options} sh/superh.opt" ;;
+	sh*-*-vhex*)	tm_file="${tm_file} sh/vhex.h" ;;
 	*)		if test x$with_newlib = xyes \
 			   && test x$with_libgloss = xyes; then
 				tm_file="${tm_file} sh/newlib.h"

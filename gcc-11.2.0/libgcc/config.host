@@ -1359,7 +1359,8 @@ sh-*-rtems*)
 		libgcc-Os-4-200.a libgcc-4-300.a"
 	;;
 sh*-*-vhex*)
-	tmake_file="${tmake_file} sh/t-sh t-slibgcc-libgcc t-libgcc-pic"
+	tmake_file="${tmake_file} sh/t-sh t-slibgcc t-slibgcc-libgcc t-libgcc-pic \
+	  t-fdpbit"
 	;;
 sh-wrs-vxworks)
 	tmake_file="$tmake_file sh/t-sh t-crtstuff-pic t-fdpbit"
