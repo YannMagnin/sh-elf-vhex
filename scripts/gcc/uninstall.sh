@@ -43,7 +43,7 @@ esac; done
 # Unistall step
 #
 
-TAG='<sh-elf-vhex-binutils>'
+TAG='<sh-elf-vhex-gcc>'
 PREFIX="$prefix"
 
 # Remove symlinks
@@ -54,4 +54,4 @@ done
 
 # Remove local files
 echo "$TAG Removing installed files..."
-rm -rf ../../build/binutils
+rm -rf ../../build/gcc
