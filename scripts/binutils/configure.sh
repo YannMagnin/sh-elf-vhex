@@ -107,6 +107,12 @@ elif command -v apt >/dev/null 2>&1; then
   pm=apt
   pm_has="dpkg -s"
   pm_install="sudo apt install"
+elif command -v dnf >/dev/null 2>&1; then
+  deps="mpfr-devel libmpc-devel gmp-devel libpng-devel ppl-devel flex gcc git texinfo xz"
+  pm=dnf
+  pm_has="echo '$(rpm -qa)' | grep -i "
+  pm_install="sudo dnf install"
+  fix='-'
 elif command -v pacman >/dev/null 2>&1; then
   deps="mpfr libmpc gmp libpng ppl flex gcc git texinfo xz"
   pm=pacman
@@ -119,7 +125,7 @@ fi
 missing=""
 if [[ -z "$trust_deps" ]]; then
   for d in $deps; do
-    if ! $pm_has $d >/dev/null 2>&1; then
+    if ! bash -c "$pm_has $d$fix" >/dev/null 2>&1; then
       missing="$missing $d"
     fi
   done

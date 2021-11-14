@@ -2,8 +2,6 @@
 
 verbose=false
 
-read -n 1 -p 'wait user key....' _test
-
 #
 # Help screen
 #
@@ -159,9 +157,9 @@ cd ..
 echo "$TAG Patch the standard library..."
 
 rm -rf fxlibc
-git clone https://gitea.planet-casio.com/Vhex-Kernel-Core/fxlibc.git
+$quiet git clone https://gitea.planet-casio.com/Vhex-Kernel-Core/fxlibc.git
 cd fxlibc
-git checkout dev
+$quiet git checkout dev
 
 $quiet cmake -DFXLIBC_TARGET=vhex-sh -B build-vhex \
     -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-vhex.cmake \
@@ -208,14 +206,12 @@ $quiet $make_cmd -j"$cores" install-strip-gcc
 echo "$TAG Install C standar library..."
 
 cd ../../OpenLibm
-echo " - OpenLibm"
 $quiet $make_cmd USEGCC=1 ARCH=sh3eb TOOLPREFIX=sh-elf-vhex- \
   CC=sh-elf-vhex-gcc AR=sh-elf-vhex-ar \
   libdir="$LIP" includedir="$LIP/include" \
   install-static install-headers
 
 cd ../fxlibc/build-vhex
-echo " - FxLibC"
 $quiet $make_cmd install
 
 
