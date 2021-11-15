@@ -57,30 +57,7 @@ PREFIX="$prefix"
 # Avoid rebuilds of the same version
 
 [[ ! -d ../../build/binutils/build ]] && exit 0
-cd ../../build/binutils/build
-
-# add utilities
-
-source ../../../scripts/util.sh
-
-
-# check gmake or make (macos support)
-
-if command -v gmake >/dev/null 2>&1; then
-  make_command=gmake
-else
-  make_command=make
-fi
-
-# build part
-
-echo "$TAG Installing to local folder..."
-if [[ "$verbose" == 'true' ]]; then
-  $make_command install-strip
-else
-  run_quietly giteapc-install.log $make_command install-strip
-fi
-cd ..
+cd ../../build/binutils
 
 # Symbolic link executables to $PREFIX/bin
 

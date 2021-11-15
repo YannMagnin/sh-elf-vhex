@@ -1,9 +1,8 @@
 #! /usr/bin/env bash
 
 verbose=false
-no_cache=false
+cache=false
 version='?'
-prefix=
 
 
 #
@@ -21,7 +20,6 @@ Configurations:
   -h, --help            Display this help
   --no-cache            Do not keep the archive of binutils
   --verbose             Display extra information during the configuration step
-  --prefix=<PREFIX>     Installation prefix
   --version=<VERSION>   Select the GCC version. If the '?' argument is
                         passed then all binutils version with Vhex patch
                         availables will be printed
@@ -40,8 +38,7 @@ OEF
 for arg; do case "$arg" in
   --help | -h)          help;;
   --verbose)            verbose=true;;
-  --no-cache)           no_cache=true;;
-  --prefix=*)           prefix=${arg#*=};;
+  --cache)              cache=true;;
   --version=*)          version=${arg#*=};;
   *)
     echo "error: unreconized argument '$arg', giving up." >&2
@@ -74,20 +71,19 @@ fi
 
 TAG='<sh-elf-vhex-gcc>'
 VERSION="$version"
-PREFIX="$prefix"
 URL="https://ftp.gnu.org/gnu/gcc/gcc-$VERSION/gcc-$VERSION.tar.xz"
 ARCHIVE="../../cache/$(basename $URL)"
 
 # Avoid rebuilds of the same version
 
-existing_gcc="$PREFIX/bin/sh-elf-vhex-gcc"
+existing_gcc="../../build/gcc/bin/sh-elf-vhex-gcc"
 
 if [[ -f "$existing_gcc" ]]; then
   existing_version=$($existing_gcc --version | head -n 1 | grep -Eo '[0-9.]+$')
   if [[ $existing_version == $VERSION ]]; then
     echo "$TAG Version $VERSION already installed, skipping rebuild"
-    if [[ -e build ]]; then
-      rm -rf build
+    if [[ -e ../../build/gcc/build ]]; then
+      rm -rf ../../build/gcc/build
     fi
     exit 0
   fi
@@ -132,15 +128,15 @@ mv ./gcc-$VERSION/ ./gcc
 # Symlink as, ld, ar and ranlib, which gcc will not find by itself (we renamed
 # them from sh3eb-elf-* to sh-elf-* with --program-prefix).
 mkdir -p sh-elf-vhex/bin
-ln -sf $PREFIX/bin/sh-elf-vhex-as sh-elf-vhex/bin/as
-ln -sf $PREFIX/bin/sh-elf-vhex-ld sh-elf-vhex/bin/ld
-ln -sf $PREFIX/bin/sh-elf-vhex-ar sh-elf-vhex/bin/ar
-ln -sf $PREFIX/bin/sh-elf-vhex-ranlib sh-elf-vhex/bin/ranlib
+ln -sf $(pwd)/../binutils/bin/sh-elf-vhex-as sh-elf-vhex/bin/as
+ln -sf $(pwd)/../binutils/bin/sh-elf-vhex-ld sh-elf-vhex/bin/ld
+ln -sf $(pwd)/../binutils/bin/sh-elf-vhex-ar sh-elf-vhex/bin/ar
+ln -sf $(pwd)/../binutils/bin/sh-elf-vhex-ranlib sh-elf-vhex/bin/ranlib
 
-# patch OpenLibM building error (find for sh-elf-vhex-ar)
-ln -sf $PREFIX/bin/sh-elf-vhex-ar sh-elf-vhex/bin/sh-elf-vhex-ar
+# patch OpenLibM building error (which search for sh-elf-vhex-ar)
+ln -sf $(pwd)/../binutils/bin/sh-elf-vhex-ar sh-elf-vhex/bin/sh-elf-vhex-ar
 
-if [[ "$no_cache" == 'true' ]]; then
+if [[ "$cache" == 'false' ]]; then
    echo "$TAG Removing $ARCHIVE..."
    rm -f $ARCHIVE
 fi

@@ -2,7 +2,7 @@
 
 
 verbose=false
-no_cache=false
+cache=false
 version='?'
 prefix=
 
@@ -20,9 +20,8 @@ Usage $0 [options...]
 
 Configurations:
   -h, --help            Display this help
-  --no-cache            Do not keep the archive of binutils
+  --cache               Keep the archive of binutils
   --verbose             Display extra information during the configuration step
-  --prefix=<PREFIX>     Installation prefix
   --version=<VERSION>   Select the binutils version. If the '?' argument is
                         passed then all binutils version with Vhex patch
                         availables will be printed
@@ -41,7 +40,7 @@ OEF
 for arg; do case "$arg" in
   --help | -h)          help;;
   --verbose)            verbose=true;;
-  --no-cache)           no_cache=true;;
+  --cache)              cache=true;;
   --prefix=*)           prefix=${arg#*=};;
   --version=*)          version=${arg#*=};;
   *)
@@ -77,13 +76,12 @@ fi
 
 TAG='<sh-elf-vhex-binutils>'
 VERSION=$version
-PREFIX="$prefix"
 URL="https://ftp.gnu.org/gnu/binutils/binutils-$VERSION.tar.xz"
 ARCHIVE="../../cache/$(basename $URL)"
 
 # Avoid rebuilds of the same version
 
-existing_as="$PREFIX/bin/sh-elf-vhex-as"
+existing_as="../../build/binutils/bin/sh-elf-vhex-as"
 
 if [[ -f "$existing_as" ]]; then
   existing_version=$($existing_as --version | head -n 1 | grep -Eo '[0-9.]+$')
@@ -209,21 +207,16 @@ if command -v termux-setup-storage >/dev/null 2>&1; then
   CXXFLAGS="-D__ANDROID_API__=$(getprop ro.build.version.sdk) -g -O2"
 fi
 
-# Real configuration step
-if [[ "$verbose" == "true" ]]; then
-  ../binutils-$VERSION/configure --prefix="$PREFIX" --target=sh-elf-vhex \
-       --with-multilib-list=m3,m4-nofpu --disable-nls --enable-lto
-else
-  source ../../../scripts/util.sh
 
-  run_quietly giteapc-configure.log \
-    ../binutils-$VERSION/configure --prefix="$PREFIX" --target=sh-elf-vhex \
-        --with-multilib-list=m3,m4-nofpu --disable-nls --enable-lto
-fi
-cd ..
+# check quiet mode
+source ../../../scripts/utils.sh
+
+# Real configuration step
+$quiet ../binutils-$VERSION/configure --prefix="$PREFIX" --target=sh-elf-vhex \
+       --with-multilib-list=m3,m4-nofpu --disable-nls --enable-lto
 
 # cache management
-if [[ "$no_cache" == 'true' ]]; then
+if [[ "$cache" == 'false' ]]; then
    echo "$TAG Removing $ARCHIVE..."
    rm -f $ARCHIVE
 fi

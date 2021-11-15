@@ -56,16 +56,7 @@ esac; done
 TAG='<sh-elf-vhex-gcc>'
 
 # import utility
-source ../util.sh
-
-# Number of processor cores
-[[ $(uname) == "OpenBSD" ]] && cores=$(sysctl -n hw.ncpu) || cores=$(nproc)
-
-# check macos make utility
-[[ $(command -v gmake >/dev/null 2>&1) ]] && make_cmd=gmake || make_cmd=make
-
-# check quiet build
-[[ "$verbose" == "true" ]] && quiet='' || quiet='run_quietly giteapc-build.log'
+source ../utils.sh
 
 # OpenBSD apparently installs these in /usr/local
 extra_args=

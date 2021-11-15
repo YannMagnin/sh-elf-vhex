@@ -29,6 +29,8 @@ OEF
 # Parse argument
 #
 
+[[ $# -eq 0 ]] && help
+
 for arg; do case "$arg" in
   --help | -h)          help;;
   --verbose)            verbose=true;;
@@ -46,6 +48,11 @@ esac; done
 TAG='<sh-elf-vhex-gcc>'
 PREFIX="$prefix"
 
+# Avoid rebuilds of the same version
+
+[[ ! -d ../../build/gcc ]] && exit 0
+cd ../../build/gcc
+
 # Remove symlinks
 echo "$TAG Removing symlinks to binaries..."
 for x in bin/*; do
@@ -54,4 +61,5 @@ done
 
 # Remove local files
 echo "$TAG Removing installed files..."
-rm -rf ../../build/gcc
+rm -rf ../gcc
+exit 0

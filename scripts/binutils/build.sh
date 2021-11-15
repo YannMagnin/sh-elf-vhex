@@ -47,17 +47,16 @@ TAG='<sh-elf-vhex-binutils>'
 [[ ! -d ../../build/binutils/build ]] && exit 0
 cd ../../build/binutils/build
 
-# Number of processor cores
-[[ $(uname) == "OpenBSD" ]] && cores=$(sysctl -n hw.ncpu) || cores=$(nproc)
 
-# selecte make utility
-[[ $(command -v gmake >/dev/null 2>&1) ]] && make_cmd=gmake || make_cmd=make
+# import some utility
+source ../../../scripts/utils.sh
 
+
+# build part
 echo "$TAG Compiling binutils (usually 5-10 minutes)..."
 
-if [[ "$verbose" == 'false' ]]; then
-  source ../../../scripts/util.sh
-  run_quietly giteapc-build.log $make_cmd -j"$cores"
-else
-  $make_cmd -j"$cores"
-fi
+$quiet $make_cmd -j"$cores"
+
+echo "$TAG Installing to local folder..."
+
+$quiet $make_cmd install-strip

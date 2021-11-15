@@ -46,6 +46,11 @@ esac; done
 TAG='<sh-elf-vhex-binutils>'
 PREFIX="$prefix"
 
+# Avoid rebuilds of the same version
+
+[[ ! -d ../../build/binutils ]] && exit 0
+cd ../../build/binutils
+
 # Remove symlinks
 echo "$TAG Removing symlinks to binaries..."
 for x in bin/*; do
@@ -54,4 +59,4 @@ done
 
 # Remove local files
 echo "$TAG Removing installed files..."
-rm -rf ../../build/binutils
+rm -rf ../binutils
