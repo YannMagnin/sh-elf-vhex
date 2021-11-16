@@ -1,20 +1,15 @@
 #! /usr/bin/env bash
 
-
 verbose=false
 cache=false
 version='?'
-prefix=
-
 
 #
 # Help screen
 #
-help()
-{
+help() {
   cat << OEF
-Configuration file for the configuration step of the binutils build for the
-Vhex kernel project.
+Script for the configuration step of Vhex kernel's binutils.
 
 Usage $0 [options...]
 
@@ -22,9 +17,9 @@ Configurations:
   -h, --help            Display this help
   --cache               Keep the archive of binutils
   --verbose             Display extra information during the configuration step
-  --version=<VERSION>   Select the binutils version. If the '?' argument is
-                        passed then all binutils version with Vhex patch
-                        availables will be printed
+  --version=<VERSION>   Select the binutils version. If '?' argument is passed,
+                          then all binutils version with Vhex patchs available
+                          will be displayed
 OEF
   exit 0
 }
@@ -32,7 +27,7 @@ OEF
 
 
 #
-# Parse argument
+# Parse arguments
 #
 
 [[ $# -eq 0 ]] && help
@@ -41,12 +36,12 @@ for arg; do case "$arg" in
   --help | -h)          help;;
   --verbose)            verbose=true;;
   --cache)              cache=true;;
-  --prefix=*)           prefix=${arg#*=};;
   --version=*)          version=${arg#*=};;
   *)
-    echo "error: unreconized argument '$arg', giving up." >&2
+    echo "error: unrecognized argument '$arg', giving up" >&2
     exit 1
 esac; done
+
 
 
 #
@@ -54,6 +49,7 @@ esac; done
 #
 
 # check version
+
 list_version=$(basename $(ls -d ../../patchs/binutils/*))
 if [[ "$version" == '?' ]];  then
   echo "$list_version"
@@ -69,9 +65,6 @@ fi
 
 #
 # Configuration part
-# @note
-#  This part is forked from the sh-elf-binutils repository created by
-#  Lephenixnoir.
 #
 
 TAG='<sh-elf-vhex-binutils>'
@@ -95,6 +88,7 @@ if [[ -f "$existing_as" ]]; then
 fi
 
 # Check dependencies for binutils and GCC
+
 if command -v pkg >/dev/null 2>&1; then
   deps="libmpfr libmpc libgmp libpng flex clang git texinfo libisl bison xz-utils"
   pm=pkg
@@ -186,10 +180,11 @@ cp -r ../../patchs/binutils/$VERSION/* ./binutils-$VERSION/
 [[ -d "build" ]] && rm -rf build
 mkdir build
 
-# Configure. binutils does not support the uninstall target (wow) so we just
-# install in this directory and later symlink executables to $PREFIX/bin.
+# Configure binutils does not support the uninstall target (wow) so we just
+# install in this directory and later symlink executables to the "real" prefix.
 
 PREFIX="$(pwd)"
+
 cd build
 
 echo "$TAG Configuring binutils..."
@@ -197,8 +192,8 @@ echo "$TAG Configuring binutils..."
 if command -v termux-setup-storage >/dev/null 2>&1; then
   # Since the __ANDROID_API__ flag is hardcoded as 24 in clang, and <stdio.h>
   # doesn't prototype some functions when this flag is too low, fixes it's
-  # version by checking system's properties so as to prevent from missing prototypes
-  # of existing functions such as fgets_unlocked (only if API >= 28)
+  # version by checking system's properties so as to prevent from missing
+  # prototypes of existing functions such as fgets_unlocked (only if API >= 28)
   # See the following issues :
   # * https://github.com/termux/termux-packages/issues/6176
   # * https://github.com/termux/termux-packages/issues/2469
@@ -208,14 +203,17 @@ if command -v termux-setup-storage >/dev/null 2>&1; then
 fi
 
 
-# check quiet mode
+# Import some helpers
+
 source ../../../scripts/utils.sh
 
 # Real configuration step
+
 $quiet ../binutils-$VERSION/configure --prefix="$PREFIX" --target=sh-elf-vhex \
        --with-multilib-list=m3,m4-nofpu --disable-nls --enable-lto
 
-# cache management
+# Cache management
+
 if [[ "$cache" == 'false' ]]; then
    echo "$TAG Removing $ARCHIVE..."
    rm -f $ARCHIVE

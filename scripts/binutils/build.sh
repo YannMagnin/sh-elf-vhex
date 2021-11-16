@@ -5,11 +5,9 @@ verbose=false
 #
 # Help screen
 #
-help()
-{
+help() {
   cat << OEF
-Building helper script for the configuration step of the binutils build for the
-Vhex kernel project.
+Script for the building step of binutils for the Vhex kernel.
 
 Usage $0 [options...]
 
@@ -23,7 +21,7 @@ OEF
 
 
 #
-# Parse argument
+# Parse arguments
 #
 
 for arg; do case "$arg" in
@@ -42,17 +40,23 @@ esac; done
 
 TAG='<sh-elf-vhex-binutils>'
 
+# Check that the configuration step has been effectuated
 
-# Avoid rebuilds of the same version
-[[ ! -d ../../build/binutils/build ]] && exit 0
+if [[ ! -d ../../build/binutils/build ]]; then
+  echo "error: Are you sure to have configured binutils ? it seems that" >&2
+  echo "  the build directory is missing..." >&2
+  exit 1
+fi
 cd ../../build/binutils/build
 
 
-# import some utility
+# Import some helpers
+
 source ../../../scripts/utils.sh
 
 
-# build part
+# Build part
+
 echo "$TAG Compiling binutils (usually 5-10 minutes)..."
 
 $quiet $make_cmd -j"$cores"
@@ -60,3 +64,4 @@ $quiet $make_cmd -j"$cores"
 echo "$TAG Installing to local folder..."
 
 $quiet $make_cmd install-strip
+exit 0

@@ -1,3 +1,4 @@
+# module used to provide common variable / functions
 
 # select the appropriate quiet primitive
 quiet='run_normaly'
@@ -6,10 +7,12 @@ quiet='run_normaly'
 # Number of processor cores
 [[ $(uname) == "OpenBSD" ]] && cores=$(sysctl -n hw.ncpu) || cores=$(nproc)
 
-# selecte make utility
+# Selecte make utility
 [[ $(command -v gmake >/dev/null 2>&1) ]] && make_cmd=gmake || make_cmd=make
 
-## functions privided
+#
+# Functions privided
+#
 
 run_normaly() {
   bash -c "$@"

@@ -10,14 +10,13 @@ prefix=
 help()
 {
   cat << OEF
-Installation helper script for the configuration step of the binutils build for
-the Vhex kernel project.
+Script for the uninstallation of the Vhex kernel's binutils.
 
 Usage $0 [options...]
 
 Configurations:
   -h, --help            Display this help
-  --verbose             Display extra information during the installation step
+  --verbose             Display extra information during the uninstallation
   --prefix=<PREFIX>     Installation prefix
 OEF
   exit 0
@@ -26,8 +25,10 @@ OEF
 
 
 #
-# Parse argument
+# Parse arguments
 #
+
+[[ $# -eq 0 ]] && help
 
 for arg; do case "$arg" in
   --help | -h)          help;;
@@ -46,17 +47,23 @@ esac; done
 TAG='<sh-elf-vhex-binutils>'
 PREFIX="$prefix"
 
-# Avoid rebuilds of the same version
+# Check that the configuration step has been effectuated
 
-[[ ! -d ../../build/binutils ]] && exit 0
+if [[ ! -d ../../build/binutils/build ]]; then
+  echo "error: Are you sure to have configured binutils ? it seems that" >&2
+  echo "  the build directory is missing..." >&2
+  exit 1
+fi
 cd ../../build/binutils
 
 # Remove symlinks
+
 echo "$TAG Removing symlinks to binaries..."
 for x in bin/*; do
   rm "$PREFIX/$x"
 done
 
 # Remove local files
+
 echo "$TAG Removing installed files..."
 rm -rf ../binutils

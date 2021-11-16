@@ -10,8 +10,7 @@ prefix=
 help()
 {
   cat << OEF
-Installation helper script for the configuration step of the binutils build for
-the Vhex kernel project.
+Script for the uninstallation of the Vhex kernel's GCC.
 
 Usage $0 [options...]
 
@@ -26,7 +25,7 @@ OEF
 
 
 #
-# Parse argument
+# Parse arguments
 #
 
 [[ $# -eq 0 ]] && help
@@ -48,18 +47,25 @@ esac; done
 TAG='<sh-elf-vhex-gcc>'
 PREFIX="$prefix"
 
-# Avoid rebuilds of the same version
+# Check that the configuration step has been effectuated
 
-[[ ! -d ../../build/gcc ]] && exit 0
+if [[ ! -d ../../build/gcc/build ]]; then
+  echo "error: Are you sure to have configured GCC ? it seems that" >&2
+  echo "  the build directory is missing..." >&2
+  exit 1
+fi
 cd ../../build/gcc
 
 # Remove symlinks
+
 echo "$TAG Removing symlinks to binaries..."
+
 for x in bin/*; do
   rm "$PREFIX/$x"
 done
 
 # Remove local files
+
 echo "$TAG Removing installed files..."
 rm -rf ../gcc
 exit 0

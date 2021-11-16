@@ -4,25 +4,22 @@ verbose=false
 cache=false
 version='?'
 
-
 #
 # Help screen
 #
-help()
-{
+help() {
   cat << OEF
-Configuration file for the configuration step of the GCC build for the Vhex
-kernel project.
+Script for the configuration step of Vhex kernel's binutils.
 
 Usage $0 [options...]
 
 Configurations:
   -h, --help            Display this help
-  --no-cache            Do not keep the archive of binutils
+  --cache               Keep the archive of GCC
   --verbose             Display extra information during the configuration step
-  --version=<VERSION>   Select the GCC version. If the '?' argument is
-                        passed then all binutils version with Vhex patch
-                        availables will be printed
+  --version=<VERSION>   Select the GCC version. If '?' argument is passed,
+                          then all GCC version with Vhex patchs available
+                          will be displayed
 OEF
   exit 0
 }
@@ -30,7 +27,7 @@ OEF
 
 
 #
-# Parse argument
+# Parse arguments
 #
 
 [[ $# -eq 0 ]] && help
@@ -51,6 +48,7 @@ esac; done
 #
 
 # check version
+
 list_version=$(basename $(ls -d ../../patchs/gcc/*))
 if [[ "$version" == '?' ]];  then
   echo "$list_version"
@@ -62,11 +60,10 @@ if [[ ! $list_version =~ (^|[[:space:]])$version($|[[:space:]]) ]]; then
   exit 1
 fi
 
+
+
 #
 # Configuration part
-# @note
-#  This part is forked from the sh-elf-binutils repository created by
-#  Lephenixnoir.
 #
 
 TAG='<sh-elf-vhex-gcc>'
@@ -119,14 +116,14 @@ unxz -c < $ARCHIVE | tar -xf -
 echo "$TAG Apply Vhex patchs..."
 cp -r ../../patchs/gcc/$VERSION/* ./gcc-$VERSION/
 
-# Rename the directory to avoid path deduction during configuration part in
-# build.sh
+# Rename the extracted directory to avoid path deduction during building strep
 
 [[ -d ./gcc ]] && rm -rf ./gcc
 mv ./gcc-$VERSION/ ./gcc
 
 # Symlink as, ld, ar and ranlib, which gcc will not find by itself (we renamed
 # them from sh3eb-elf-* to sh-elf-* with --program-prefix).
+
 mkdir -p sh-elf-vhex/bin
 ln -sf $(pwd)/../binutils/bin/sh-elf-vhex-as sh-elf-vhex/bin/as
 ln -sf $(pwd)/../binutils/bin/sh-elf-vhex-ld sh-elf-vhex/bin/ld
@@ -135,6 +132,8 @@ ln -sf $(pwd)/../binutils/bin/sh-elf-vhex-ranlib sh-elf-vhex/bin/ranlib
 
 # patch OpenLibM building error (which search for sh-elf-vhex-ar)
 ln -sf $(pwd)/../binutils/bin/sh-elf-vhex-ar sh-elf-vhex/bin/sh-elf-vhex-ar
+
+# Cache management
 
 if [[ "$cache" == 'false' ]]; then
    echo "$TAG Removing $ARCHIVE..."

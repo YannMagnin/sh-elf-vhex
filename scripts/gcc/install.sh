@@ -4,15 +4,12 @@ verbose=false
 cache=false
 prefix=
 
-
 #
 # Help screen
 #
-help()
-{
+help() {
   cat << OEF
-Installation helper script for the configuration step of the binutils build for
-the Vhex kernel project.
+Script for the installation step of GCC for the Vhex kernel.
 
 Usage $0 [options...]
 
@@ -28,7 +25,7 @@ OEF
 
 
 #
-# Parse argument
+# Parse arguments
 #
 
 [[ $# -eq 0 ]] && help
@@ -44,21 +41,22 @@ for arg; do case "$arg" in
 esac; done
 
 
+
 #
 # Installation step
-# @note
-#  This part is forked from the sh-elf-binutils repository created by
-#  Lephenixnoir.
 #
 
 TAG='<sh-elf-vhex-gcc>'
 PREFIX="$prefix"
 
-# Avoid rebuilds of the same version
+# Check that the configuration step has been effectuated
 
-[[ ! -d ../../build/gcc ]] && exit 0
+if [[ ! -d ../../build/gcc/build ]]; then
+  echo "error: Are you sure to have configured GCC ? it seems that" >&2
+  echo "  the build directory is missing..." >&2
+  exit 1
+fi
 cd ../../build/gcc
-
 
 # Symbolic link executables to $PREFIX/bin
 
