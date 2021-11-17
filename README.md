@@ -1,13 +1,10 @@
 # sh-elf-vhex - modified GCC for the Vhex kernel projet
 
----
 
 ## Context
 
 This project was born following the discovery of a limitation with GCC on the
-SuperH architecture
-(see on this subject from 2 years ago:
-https://gcc.gnu.org/legacy-ml/gcc-help/current/000075.html).
+SuperH architecture [see on this subject from 2 years ago](https://gcc.gnu.org/legacy-ml/gcc-help/current/000075.html):
 
 The generation of dynamic libraries is blocked by GCC (the `--shared` flag is ignored),
 because the `sh3eb-elf` target (the one used for cross-compiling on Casio calculators),
@@ -30,7 +27,6 @@ This repository gathers only the files that we had to modify for
 `binutils` and` GCC`, as well as scripts to automate the installation of this
 particular GCC.
 
----
 
 ## Build
 
@@ -49,7 +45,6 @@ giteapc install sh-elf-vhex
 
 It takes about twenty minutes for the build.
 
----
 
 ## Technical notes
 
@@ -81,7 +76,6 @@ As for the details of the `sh-elf-vhex` target that we created:
   * by default, we link our own C library to each generation of an object file
   * we do not provide a specialized default linker script (for the moment)
 
----
 
 ## Special thanks
 
