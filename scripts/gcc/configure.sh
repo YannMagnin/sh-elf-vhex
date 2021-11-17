@@ -121,6 +121,12 @@ cp -r ../../patchs/gcc/$VERSION/* ./gcc-$VERSION/
 [[ -d ./gcc ]] && rm -rf ./gcc
 mv ./gcc-$VERSION/ ./gcc
 
+# Install dependencies
+
+cd gcc
+./contrib/download_prerequisites
+cd ..
+
 # Symlink as, ld, ar and ranlib, which gcc will not find by itself (we renamed
 # them from sh3eb-elf-* to sh-elf-* with --program-prefix).
 
