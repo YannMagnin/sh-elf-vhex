@@ -130,8 +130,11 @@ ln -sf $(pwd)/../binutils/bin/sh-elf-vhex-ld sh-elf-vhex/bin/ld
 ln -sf $(pwd)/../binutils/bin/sh-elf-vhex-ar sh-elf-vhex/bin/ar
 ln -sf $(pwd)/../binutils/bin/sh-elf-vhex-ranlib sh-elf-vhex/bin/ranlib
 
-# patch OpenLibM building error (which search for sh-elf-vhex-ar)
+# Patch OpenLibM building error (which search for sh-elf-vhex-ar)
 ln -sf $(pwd)/../binutils/bin/sh-elf-vhex-ar sh-elf-vhex/bin/sh-elf-vhex-ar
+
+# Install dependencies
+./gcc/contrib/download_prerequisites
 
 # Cache management
 

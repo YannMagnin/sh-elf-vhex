@@ -1,9 +1,13 @@
 #! /usr/bin/env bash
 
-echo "Compil and install binutils"
-cd scripts/binutils
-./configure.sh --version=2.37 && ./build.sh && ./install.sh --prefix=/tmp
+# check mandatory args
+if [[ $# -eq 0 ]]; then
+  echo "missing install path prefix !" >&2
+  exit 1
+fi
 
-echo "Compil and install GCC"
+cd scripts/binutils
+./configure.sh --version=2.37 && ./build.sh && ./install.sh --prefix="$1"
+
 cd ../gcc
-./configure.sh --version=11.2.0 && ./build.sh && ./install.sh --prefix=/tmp
+./configure.sh --version=11.2.0 && ./build.sh && ./install.sh --prefix="$1"
