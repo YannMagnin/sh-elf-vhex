@@ -50,6 +50,8 @@ esac; done
 
 # check version
 
+echo "$(pwd)"
+
 list_version=$(basename $(ls -d ../../patchs/binutils/*))
 if [[ "$version" == '?' ]];  then
   echo "$list_version"

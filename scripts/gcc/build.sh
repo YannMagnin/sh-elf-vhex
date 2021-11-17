@@ -66,6 +66,9 @@ fi
 mkdir -p ../../build/gcc/build
 cd ../../build/gcc/build
 
+# Install dependencies
+../gcc/contrib/download_prerequisites
+
 
 
 #
