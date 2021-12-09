@@ -1,10 +1,15 @@
 # giteapc: version=1
 
-PREFIX ?= $(GITEAPC_PREFIX)
 VERSION_BINUTILS := 2.37
 VERSION_GCC := 11.2.0
 
--include giteapc-config.make
+# Try to find if the file is involved by giteapc or vxsdk
+ifeq ($(GITEAPC_PREFIX),)
+PREFIX ?= $(VXSDK_PREFIX)
+endif
+ifeq ($(VXSDK_PREFIX),)
+PREFIX ?= $(GITEAPC_PREFIX)
+endif
 
 configure:
 	@ cd ./scripts/binutils && ./configure.sh --version=$(VERSION_BINUTILS)

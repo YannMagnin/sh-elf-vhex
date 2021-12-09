@@ -1,0 +1,10 @@
+[package]
+name = 'sh-elf-vhex'
+version = '1.0.0'
+type = 'custom'
+
+[[build]]
+custom.configure = 'make -f giteapc.make configure'
+custom.build     = 'make -f giteapc.make build'
+custom.install   = 'make -f giteapc.make install'
+custom.uninstall = 'make -f giteapc.make uninstall'
