@@ -49,11 +49,13 @@ esac; done
 TAG='<sh-elf-vhex-gcc>'
 PREFIX="$prefix"
 
-# Check that the configuration step has been effectuated
+# Check that all tools has been generated
 
-if [[ ! -d ../../build/gcc/build ]]; then
-  echo "error: Are you sure to have configured GCC ? it seems that" >&2
-  echo "  the build directory is missing..." >&2
+existing_gcc="../../build/gcc/bin/sh-elf-vhex-gcc"
+
+if [[ ! -f "$existing_gcc" ]]; then
+  echo "error: Are you sure to have built GCC ? it seems that" >&2
+  echo "  the tool is missing..." >&2
   exit 1
 fi
 cd ../../build/gcc

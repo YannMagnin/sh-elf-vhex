@@ -40,13 +40,19 @@ esac; done
 
 TAG='<sh-elf-vhex-binutils>'
 
-# Check that the configuration step has been effectuated
+# Avoid rebuilds and error
+
+if [[ -f ../../build/binutils/.fini  ]]; then
+  echo "$TAG already build, skipping rebuild"
+  exit 0
+fi
 
 if [[ ! -d ../../build/binutils/build ]]; then
   echo "error: Are you sure to have configured binutils ? it seems that" >&2
   echo "  the build directory is missing..." >&2
   exit 1
 fi
+
 cd ../../build/binutils/build
 
 
@@ -64,4 +70,8 @@ $quiet $make_cmd -j"$cores"
 echo "$TAG Installing to local folder..."
 
 $quiet $make_cmd install-strip
+
+# Indicate that the build is finished
+
+touch ../.fini
 exit 0

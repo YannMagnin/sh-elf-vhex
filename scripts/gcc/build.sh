@@ -54,6 +54,22 @@ TAG='<sh-elf-vhex-gcc>'
 
 source ../utils.sh
 
+
+# Avoid rebuilds and error
+
+if [[ -f ../../build/gcc/.fini ]]; then
+  echo "$TAG already build, skipping rebuild"
+  exit 0
+fi
+
+if [[ ! -d ../../build/gcc/build ]]; then
+  echo "error: Are you sure to have built GCC ? it seems that" >&2
+  echo "  the build directory is missing..." >&2
+  exit 1
+fi
+
+cd ../../build/gcc/build
+
 # OpenBSD apparently installs these in /usr/local
 
 extra_args=
@@ -61,10 +77,7 @@ if [[ $(uname) == "OpenBSD" ]]; then
   extra_args='--with-gmp=/usr/local --with-mpfr=/usr/local --with-mpc=/usr/local'
 fi
 
-# Create the build directory
 
-mkdir -p ../../build/gcc/build
-cd ../../build/gcc/build
 
 
 
@@ -146,9 +159,8 @@ cd ..
 # Build Vhex custom C standard library
 
 rm -rf fxlibc
-$quiet git clone https://gitea.planet-casio.com/Vhex-Kernel-Core/fxlibc.git
+$quiet git clone https://gitea.planet-casio.com/Vhex-Kernel-Core/fxlibc.git --branch dev
 cd fxlibc
-$quiet git checkout dev
 
 $quiet cmake -DFXLIBC_TARGET=vhex-sh -B build-vhex \
     -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-vhex.cmake \
@@ -230,4 +242,8 @@ $quiet $make_cmd -j"$cores" all-target-libgcc
 echo "$TAG Install libgcc (stage 2)..."
 
 $quiet $make_cmd -j"$cores" install-strip-target-libgcc
+
+# Indicate that the build is finished
+
+touch ../.fini
 exit 0

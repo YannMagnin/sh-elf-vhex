@@ -79,11 +79,10 @@ if [[ -f "$existing_gcc" ]]; then
   existing_version=$($existing_gcc --version | head -n 1 | grep -Eo '[0-9.]+$')
   if [[ $existing_version == $VERSION ]]; then
     echo "$TAG Version $VERSION already installed, skipping rebuild"
-    if [[ -e ../../build/gcc/build ]]; then
-      rm -rf ../../build/gcc/build
-    fi
     exit 0
   fi
+  [[ -d ../../build/gcc/build ]] && rm -rf ../../build/gcc/build
+  [[ -f ../../build/gcc/.fini ]] && rm -f  ../../build/gcc/.fini
 fi
 
 # Download archive
@@ -106,7 +105,7 @@ fi
 
 echo "$TAG Extracting $ARCHIVE..."
 
-mkdir -p ../../build/gcc/
+mkdir -p ../../build/gcc/build
 cd ../../build/gcc
 
 unxz -c < $ARCHIVE | tar -xf -

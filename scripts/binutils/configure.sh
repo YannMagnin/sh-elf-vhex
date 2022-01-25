@@ -50,8 +50,6 @@ esac; done
 
 # check version
 
-echo "$(pwd)"
-
 list_version=$(basename $(ls -d ../../patchs/binutils/*))
 if [[ "$version" == '?' ]];  then
   echo "$list_version"
@@ -82,11 +80,10 @@ if [[ -f "$existing_as" ]]; then
   existing_version=$($existing_as --version | head -n 1 | grep -Eo '[0-9.]+$')
   if [[ $existing_version == $VERSION ]]; then
     echo "$TAG Version $VERSION already installed, skipping rebuild"
-    if [[ -e build ]]; then
-      rm -rf build
-    fi
     exit 0
   fi
+  [[ -d ../../build/binutils/build ]] && rm -rf ../../build/binutils/build
+  [[ -f ../../build/binutils/.fini ]] && rm -f  ../../build/binutils/.fini
 fi
 
 # Check dependencies for binutils and GCC

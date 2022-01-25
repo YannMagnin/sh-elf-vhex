@@ -49,11 +49,13 @@ esac; done
 TAG='<sh-elf-vhex-binutils>'
 PREFIX="$prefix"
 
-# Check that the configuration step has been effectuated
+# Check that all tools has been generated
 
-if [[ ! -d ../../build/binutils/build ]]; then
-  echo "error: Are you sure to have configured binutils ? it seems that" >&2
-  echo "  the build directory is missing..." >&2
+existing_as="../../build/binutils/bin/sh-elf-vhex-as"
+
+if [[ ! -f "$existing_as" ]]; then
+  echo "error: Are you sure to have built binutils ? it seems that" >&2
+  echo "  the 'as' tool is missing..." >&2
   exit 1
 fi
 cd ../../build/binutils
