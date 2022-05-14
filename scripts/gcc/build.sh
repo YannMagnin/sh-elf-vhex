@@ -134,7 +134,7 @@ echo "$TAG Building Vhex's custom C standard library..."
 # Install OpenLibM
 
 rm -rf OpenLibm
-$quiet git clone https://gitea.planet-casio.com/Lephenixnoir/OpenLibm.git --depth=1
+$quiet git clone https://gitea.planet-casio.com/Vhex-Kernel-Core/OpenLibm.git --depth=1
 cd OpenLibm
 
 # Get installation path
@@ -143,13 +143,13 @@ LIP=$(sh-elf-vhex-gcc --print-search-dirs | grep install | sed 's/install: //')
 
 # Build
 
-$quiet $make_cmd USEGCC=1 ARCH=sh3eb TOOLPREFIX=sh-elf-vhex- \
+$quiet $make_cmd USEGCC=1 FORCE_PIC=1 ARCH=sh3eb TOOLPREFIX=sh-elf-vhex- \
   CC=sh-elf-vhex-gcc AR=sh-elf-vhex-ar \
   libdir="$LIP" includedir="$LIP/include"
 
 # Install (needed by fxlibc)
 
-$quiet $make_cmd USEGCC=1 ARCH=sh3eb TOOLPREFIX=sh-elf-vhex- \
+$quiet $make_cmd USEGCC=1 FORCE_PIC=1 ARCH=sh3eb TOOLPREFIX=sh-elf-vhex- \
   CC=sh-elf-vhex-gcc AR=sh-elf-vhex-ar \
   libdir="$LIP" includedir="$LIP/include" \
   install-static install-headers
@@ -159,10 +159,10 @@ cd ..
 # Build Vhex custom C standard library
 
 rm -rf fxlibc
-$quiet git clone https://gitea.planet-casio.com/Vhex-Kernel-Core/fxlibc.git --branch dev
+$quiet git clone https://gitea.planet-casio.com/Vhex-Kernel-Core/fxlibc.git --branch dev --depth=1
 cd fxlibc
 
-$quiet cmake -DFXLIBC_TARGET=vhex-sh -B build-vhex \
+$quiet cmake -DFXLIBC_PIC=1 -DFXLIBC_TARGET=vhex-sh -B build-vhex \
     -DCMAKE_TOOLCHAIN_FILE=cmake/toolchain-vhex.cmake \
     -DCMAKE_C_COMPILER_WORKS=1 -DCMAKE_INSTALL_PREFIX="$LIP"
 

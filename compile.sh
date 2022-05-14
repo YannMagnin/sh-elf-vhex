@@ -6,6 +6,7 @@ if [[ $# -eq 0 ]]; then
   exit 1
 fi
 
+
 cd scripts/binutils
 ./configure.sh --version=2.37 && ./build.sh && ./install.sh --prefix="$1"
 

@@ -1,10 +1,10 @@
-[package]
+[project]
 name    = 'sh-elf-vhex'
-version = '1.0.1'
+version = '1.0.3'
 type    = 'app'
 
 [build]
-configure = 'make -f giteapc.make configure'
-build     = 'make -f giteapc.make build'
-install   = 'PREFIX=$VXSDK_INSTALL_PREFIX make -f giteapc.make install'
-uninstall = 'PREFIX=$VXSDK_INSTALL_PREFIX make -f giteapc.make uninstall'
+configure = 'make configure'
+build     = 'make build'
+install   = 'PREFIX=$VXSDK_PREFIX_INSTALL make install'
+uninstall = 'PREFIX=$VXSDK_PREFIX_INSTALL make uninstall'

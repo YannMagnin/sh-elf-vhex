@@ -1,10 +1,6 @@
-# giteapc: version=1
 
-PREFIX ?= $(GITEAPC_PREFIX)
-VERSION_BINUTILS := 2.37
-VERSION_GCC := 11.2.0
-
--include giteapc-config.make
+VERSION_BINUTILS	:= 2.37
+VERSION_GCC		:= 11.2.0
 
 configure:
 	@ cd ./scripts/binutils \

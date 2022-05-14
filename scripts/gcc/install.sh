@@ -58,13 +58,13 @@ if [[ ! -f "$existing_gcc" ]]; then
   echo "  the tool is missing..." >&2
   exit 1
 fi
-cd ../../build/gcc
+cd ../../build/gcc/bin
 
 # Symbolic link executables to $PREFIX/bin
 
 echo "$TAG Symlinking binaries..."
-mkdir -p $PREFIX/bin
-for x in bin/*; do
+mkdir -p $PREFIX
+for x in *; do
   ln -sf "$(pwd)/$x" "$PREFIX/$x"
 done
 
