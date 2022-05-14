@@ -49,7 +49,7 @@ PREFIX="$prefix"
 
 # Check that the configuration step has been effectuated
 
-if [[ ! -d ../../build/gcc/build ]]; then
+if [[ ! -d ../../build/gcc/bin ]]; then
   echo "error: Are you sure to have configured GCC ? it seems that" >&2
   echo "  the build directory is missing..." >&2
   exit 1

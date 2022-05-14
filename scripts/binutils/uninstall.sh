@@ -49,7 +49,7 @@ PREFIX="$prefix"
 
 # Check that the configuration step has been effectuated
 
-if [[ ! -d ../../build/binutils/build ]]; then
+if [[ ! -d ../../build/binutils/bin ]]; then
   echo "error: Are you sure to have configured binutils ? it seems that" >&2
   echo "  the build directory is missing..." >&2
   exit 1
