@@ -6,5 +6,5 @@ type    = 'app'
 [build]
 configure = 'make configure'
 build     = 'make build'
-install   = 'PREFIX=$VXSDK_PREFIX_INSTALL make install'
-uninstall = 'PREFIX=$VXSDK_PREFIX_INSTALL make uninstall'
+install   = 'make install'
+uninstall = 'make uninstall'

@@ -5,9 +5,9 @@ VERSION_GCC := 11.2.0
 
 # Try to find if the file is involved by giteapc or vxsdk
 ifeq ($(GITEAPC_PREFIX),)
-PREFIX ?= $(VXSDK_PREFIX)
+PREFIX ?= $(VXSDK_PREFIX_INSTALL)
 endif
-ifeq ($(VXSDK_PREFIX),)
+ifeq ($(VXSDK_PREFIX_INSTALL),)
 PREFIX ?= $(GITEAPC_PREFIX)
 endif
 
