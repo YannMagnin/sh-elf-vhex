@@ -49,9 +49,15 @@ esac; done
 
 # check version
 
-list_version=$(basename $(ls -d ../../patchs/gcc/*))
+list_version=''
+for tmp in $(ls -d ../../patchs/gcc/*); do
+  list_version="$list_version $(basename $tmp)"
+done
 if [[ "$version" == '?' ]];  then
-  echo "$list_version"
+  echo "GCC available versions:"
+  for ver in $list_version; do
+    echo "  $ver"
+  done
   exit 0
 fi
 if [[ ! $list_version =~ (^|[[:space:]])$version($|[[:space:]]) ]]; then

@@ -1,6 +1,6 @@
 
-VERSION_BINUTILS	:= 2.37
-VERSION_GCC		:= 11.2.0
+VERSION_BINUTILS	:= 2.38
+VERSION_GCC		:= 11.3.0
 
 ifeq ($(VXSDK_PREFIX_INSTALL),)
 $(error you need to use the vxSDK to compile this package)

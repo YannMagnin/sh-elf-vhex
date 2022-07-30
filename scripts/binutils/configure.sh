@@ -50,9 +50,15 @@ esac; done
 
 # check version
 
-list_version=$(basename $(ls -d ../../patchs/binutils/*))
+list_version=''
+for tmp in $(ls -d ../../patchs/binutils/*); do
+  list_version="$list_version $(basename $tmp)"
+done
 if [[ "$version" == '?' ]];  then
-  echo "$list_version"
+  echo "Binutils available versions:"
+  for ver in $list_version; do
+    echo "  $ver"
+  done
   exit 0
 fi
 if [[ ! $list_version =~ (^|[[:space:]])$version($|[[:space:]]) ]]; then
