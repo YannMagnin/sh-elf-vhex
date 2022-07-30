@@ -2,7 +2,7 @@
 
 # select the appropriate quiet primitive
 quiet='run_normaly'
-[[ "$verbose" == "false" ]] && quiet='run_quietly giteapc-build.log'
+[[ "$verbose" == "false" ]] && quiet='run_quietly vxsdk-build.log'
 
 # Number of processor cores
 [[ $(uname) == "OpenBSD" ]] && cores=$(sysctl -n hw.ncpu) || cores=$(nproc)
@@ -27,7 +27,8 @@ run_quietly() {
   shift 1
   "$@" >$out 2>&1
   if [[ "$?" != 0 ]]; then
-    echo "$TAG error: command failed, please check $(pwd)/$out o(x_x)o"
+    >&2 echo "$TAG error: command failed, please check $(pwd)/$out o(x_x)o"
+    >&2 echo "$@"
     exit 1
   fi
 }

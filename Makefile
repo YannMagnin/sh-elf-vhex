@@ -12,12 +12,12 @@ build:
 
 install:
 	@ cd ./scripts/binutils \
-		&& ./install.sh --prefix="$(PREFIX)" \
-		&& cd ../gcc && ./install.sh --prefix="$(PREFIX)"
+		&& ./install.sh --prefix="$(VXSDK_PREFIX_INSTALL)" \
+		&& cd ../gcc && ./install.sh --prefix="$(VXSDK_PREFIX_INSTALL)"
 
 uninstall:
 	@ cd ./scripts/binutils \
-		&& ./uninstall.sh --prefix="$(PREFIX)" \
-		&& cd ../gcc && ./uninstall.sh --prefix="$(PREFIX)"
+		&& ./uninstall.sh --prefix="$(VXSDK_PREFIX_INSTALL)" \
+		&& cd ../gcc && ./uninstall.sh --prefix="$(VXSDK_PREFIX_INSTALL)"
 
 .PHONY: configure build install uninstall
