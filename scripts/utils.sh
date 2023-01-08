@@ -15,7 +15,8 @@ quiet='run_normaly'
 #
 
 run_normaly() {
-  bash -c "$@"
+  echo "$@"
+  "$@"
   if [[ "$?" != 0 ]]; then
     echo "$TAG error: command failed, abord"
     exit 1
@@ -31,4 +32,16 @@ run_quietly() {
     >&2 echo "$@"
     exit 1
   fi
+  rm -f "$out"
+}
+
+get_sysroot() {
+  if [ -z $VXSDK_PREFIX_SYSROOT ]; then
+    >2& echo "error: are you sure to use the vxSDK ?"
+    >2& echo " Missing sysroot information, abord"
+    exit 1
+  fi
+  SYSROOT="${VXSDK_PREFIX_SYSROOT/#\~/$HOME}"
+  mkdir -p "$SYSROOT"
+  echo "$SYSROOT"
 }

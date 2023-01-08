@@ -3,10 +3,9 @@
 verbose=false
 prefix=
 
-
-#
+#---
 # Help screen
-#
+#---
 help()
 {
   cat << OEF
@@ -24,9 +23,10 @@ OEF
 
 
 
-#
+
+#---
 # Parse arguments
-#
+#---
 
 [[ $# -eq 0 ]] && help
 
@@ -40,30 +40,46 @@ for arg; do case "$arg" in
 esac; done
 
 
-#
+#---
 # Unistall step
-#
+#---
 
-TAG='<sh-elf-vhex-binutils>'
+source ../scripts/utils.sh
+
+TAG='<sh-elf-vhex>'
 PREFIX="$prefix"
+SYSROOT="$(get_sysroot)"
 
-# Check that the configuration step has been effectuated
+# Check that all tools has been generated
 
-if [[ ! -d ../../build/binutils/bin ]]; then
-  echo "error: Are you sure to have configured binutils ? it seems that" >&2
-  echo "  the build directory is missing..." >&2
+existing_gcc="$SYSROOT/bin/sh-elf-vhex-gcc"
+
+if [[ ! -f "$existing_gcc" ]]; then
+  echo "error: Are you sure to have built sh-elf-vhex ? it seems that" >&2
+  echo "  the 'as' tool is missing..." >&2
   exit 1
 fi
-cd ../../build/binutils
 
+
+
+
+#---
 # Remove symlinks
+#---
+
+cd "$SYSROOT/bin"
 
 echo "$TAG Removing symlinks to binaries..."
-for x in bin/*; do
-  rm "$PREFIX/$x"
+for x in *; do
+  unlink "$PREFIX/$x"
 done
 
-# Remove local files
+
+
+
+#---
+# Remove sysroot
+#---
 
 echo "$TAG Removing installed files..."
-rm -rf ../binutils
+rm -rf "$SYSROOT"

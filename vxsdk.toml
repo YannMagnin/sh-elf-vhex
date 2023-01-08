@@ -1,9 +1,11 @@
 [project]
-name    = 'sh-elf-vhex'
-type    = 'app'
+name      = 'sh-elf-vhex'
+type      = 'app'
+target    = [
+    'superh'
+]
 
-[build]
-configure = 'make configure'
+[superh.build]
 build     = 'make build'
 install   = 'make install'
 uninstall = 'make uninstall'

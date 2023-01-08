@@ -1,27 +1,60 @@
+#---
+# This makefile is particular because it can be involved many time during the
+# building process. This is why we using many conditional rule exposition
+#
+# All possible scenarii are :
+# * sh-elf-vhex -> fxlibc -> OpenLibM -> sh-elf-vhex
+# * sh-elf-vhex -> fxlibc -> sh-elf-vhex
+# * fxlibc -> sh-elf-vhex -> fxlibc -> sh-elf-vhex
+# * OpenLibM -> sh-elf-vhex -> fxlibc -> OpenLibM -> sh-elf-vhex
+#---
 
-VERSION_BINUTILS	:= 2.38
-VERSION_GCC		:= 11.3.0
+VERSION_BINUTILS := 2.38
+VERSION_GCC      := 11.3.0
+
+
+# check that the vxSDK is used
 
 ifeq ($(VXSDK_PREFIX_INSTALL),)
 $(error you need to use the vxSDK to compile this package)
 endif
 
-configure:
-	@ cd ./scripts/binutils \
-		&& ./configure.sh --version="$(VERSION_BINUTILS)" \
-		&& cd ../gcc && ./configure.sh --version="$(VERSION_GCC)"
+# default rules
 
+all: build install
+
+#---
+# Performs the real operations
+#---
+
+ifeq ($(VXSDK_COMPILER_CIRCULAR_BUILD_WORKAROUND),)
 build:
-	@ cd ./scripts/binutils && ./build.sh && cd ../gcc && ./build.sh
+	@ cd ./scripts/binutils && ./configure.sh --version="$(VERSION_BINUTILS)"
+	@ cd ./scripts/binutils && ./build.sh
+	@ cd ./scripts/gcc && ./configure.sh --version="$(VERSION_GCC)"
+	@ cd ./scripts/gcc && ./build.sh
 
 install:
-	@ cd ./scripts/binutils \
-		&& ./install.sh --prefix="$(VXSDK_PREFIX_INSTALL)" \
-		&& cd ../gcc && ./install.sh --prefix="$(VXSDK_PREFIX_INSTALL)"
+	@ cd ./scripts && ./install.sh --prefix="$(VXSDK_PREFIX_INSTALL)"
 
 uninstall:
-	@ cd ./scripts/binutils \
-		&& ./uninstall.sh --prefix="$(VXSDK_PREFIX_INSTALL)" \
-		&& cd ../gcc && ./uninstall.sh --prefix="$(VXSDK_PREFIX_INSTALL)"
+	@ cd ./scripts && ./uninstall.sh --prefix="$(VXSDK_PREFIX_INSTALL)"
 
-.PHONY: configure build install uninstall
+#---
+# If a circular build is detected, simulate that all operations have
+# successfully been executed
+#---
+
+else
+build:
+	@ true
+
+install:
+	@ true
+
+uninstall:
+	@ true
+
+endif
+
+.PHONY: all build install uninstall

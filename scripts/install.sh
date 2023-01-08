@@ -4,18 +4,18 @@ verbose=false
 cache=false
 prefix=
 
-#
+#---
 # Help screen
-#
+#---
 help() {
   cat << OEF
-Script for the installation step of GCC for the Vhex kernel.
+Script for the installation step of binutils/GCC tools for the Vhex kernel.
 
 Usage $0 [options...]
 
 Configurations:
   -h, --help            Display this help
-  --cache               Keep the build and sources directory
+  --cache               Keep the build and the sources directory
   --verbose             Display extra information during the installation step
   --prefix=<PREFIX>     Installation prefix
 OEF
@@ -24,9 +24,10 @@ OEF
 
 
 
-#
+
+#---
 # Parse arguments
-#
+#---
 
 [[ $# -eq 0 ]] && help
 
@@ -42,36 +43,46 @@ esac; done
 
 
 
-#
-# Installation step
-#
 
-TAG='<sh-elf-vhex-gcc>'
+#---
+# Installation step
+#---
+
+source ../scripts/utils.sh
+
+TAG='<sh-elf-vhex>'
 PREFIX="$prefix"
+SYSROOT="$(get_sysroot)"
 
 # Check that all tools has been generated
 
-existing_gcc="../../build/gcc/bin/sh-elf-vhex-gcc"
+existing_gcc="$SYSROOT/bin/sh-elf-vhex-gcc"
 
 if [[ ! -f "$existing_gcc" ]]; then
-  echo "error: Are you sure to have built GCC ? it seems that" >&2
-  echo "  the tool is missing..." >&2
+  echo "error: Are you sure to have built sh-elf-vhex ? it seems that" >&2
+  echo "  the 'as' tool is missing..." >&2
   exit 1
 fi
-cd ../../build/gcc/bin
-
-# Symbolic link executables to $PREFIX/bin
-
-echo "$TAG Symlinking binaries..."
-mkdir -p $PREFIX
-for x in *; do
-  ln -sf "$(pwd)/$x" "$PREFIX/$x"
-done
 
 # Cleanup build files
 
 if [[ "$cache" == 'false' ]]; then
   echo "$TAG Cleaning up build files..."
-  rm -rf gcc/
-  rm -rf build/
+  rm -rf ../../build
 fi
+
+
+
+
+#---
+# Symbolic link executables to $PREFIX
+#---
+
+echo "$TAG Symlinking binaries..."
+
+cd "$SYSROOT/bin"
+
+mkdir -p "$PREFIX"
+for x in *; do
+  ln -sf "$SYSROOT/bin/$x" "$PREFIX/$x"
+done

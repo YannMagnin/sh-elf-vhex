@@ -1,12 +1,12 @@
 #! /usr/bin/env bash
 
 verbose=false
-cache=false
+cache=true
 version='?'
 
-#
+#---
 # Help screen
-#
+#---
 help() {
   cat << OEF
 Script for the configuration step of Vhex kernel's binutils.
@@ -26,9 +26,9 @@ OEF
 
 
 
-#
+#---
 # Parse arguments
-#
+#---
 
 [[ $# -eq 0 ]] && help
 
@@ -42,12 +42,9 @@ for arg; do case "$arg" in
     exit 1
 esac; done
 
-
-#
-# Check parsing validity
-#
-
+#---
 # check version
+#---
 
 list_version=''
 for tmp in $(ls -d ../../patchs/gcc/*); do
@@ -66,20 +63,29 @@ if [[ ! $list_version =~ (^|[[:space:]])$version($|[[:space:]]) ]]; then
   exit 1
 fi
 
+#---
+# Import some helpers
+# <> get_sysroot() -> workaround with the vxsdk to fetch the sysroot path
+# <> run_quietly() -> do not display command logs and save them in log files
+#---
 
+source ../../scripts/utils.sh
 
-#
+#---
 # Configuration part
-#
+#---
 
 TAG='<sh-elf-vhex-gcc>'
 VERSION="$version"
 URL="https://ftp.gnu.org/gnu/gcc/gcc-$VERSION/gcc-$VERSION.tar.xz"
-ARCHIVE="../../cache/$(basename $URL)"
+ARCHIVE="/tmp/sh-elf-vhex/$(basename $URL)"
+SYSROOT="$(get_sysroot)"
 
+#---
 # Avoid rebuilds of the same version
+#---
 
-existing_gcc="../../build/gcc/bin/sh-elf-vhex-gcc"
+existing_gcc="$SYSROOT/bin/sh-elf-vhex-gcc"
 
 if [[ -f "$existing_gcc" ]]; then
   existing_version=$($existing_gcc --version | head -n 1 | grep -Eo '[0-9.]+$')
@@ -91,8 +97,16 @@ if [[ -f "$existing_gcc" ]]; then
   [[ -f ../../build/gcc/.fini ]] && rm -f  ../../build/gcc/.fini
 fi
 
+#---
 # Download archive
+#---
 
+if [[ "$cache" == 'false' ]]; then
+  if [[ -f "$ARCHIVE" ]]; then
+    rm -f "$ARCHIVE"
+  fi
+fi
+mkdir -p $(dirname "$ARCHIVE")
 if [[ -f "$ARCHIVE" ]]; then
   echo "$TAG Found $ARCHIVE, skipping download"
 else
@@ -107,47 +121,47 @@ else
   fi
 fi
 
+#---
 # Extract archive (openBSD-compliant version)
+#---
 
 echo "$TAG Extracting $ARCHIVE..."
 
-mkdir -p ../../build/gcc/build
-cd ../../build/gcc
+mkdir -p ../../build/gcc
+cd ../../build/gcc/
 
 unxz -c < $ARCHIVE | tar -xf -
 
+#---
 # Apply GCC patchs for Vhex
+#---
 
 echo "$TAG Apply Vhex patchs..."
 cp -r ../../patchs/gcc/$VERSION/* ./gcc-$VERSION/
 
-# Rename the extracted directory to avoid path deduction during building strep
+# Rename the extracted directory to avoid path deduction during building step
+# (so the build script will use explicitly ...build/gcc/... path)
 
 [[ -d ./gcc ]] && rm -rf ./gcc
 mv ./gcc-$VERSION/ ./gcc
 
+#---
 # Install dependencies
+#---
 
 cd gcc
 ./contrib/download_prerequisites
 cd ..
 
-# Symlink as, ld, ar and ranlib, which gcc will not find by itself (we renamed
-# them from sh3eb-elf-* to sh-elf-* with --program-prefix).
+mkdir -p build
 
-mkdir -p sh-elf-vhex/bin
-ln -sf $(pwd)/../binutils/bin/sh-elf-vhex-as sh-elf-vhex/bin/as
-ln -sf $(pwd)/../binutils/bin/sh-elf-vhex-ld sh-elf-vhex/bin/ld
-ln -sf $(pwd)/../binutils/bin/sh-elf-vhex-ar sh-elf-vhex/bin/ar
-ln -sf $(pwd)/../binutils/bin/sh-elf-vhex-ranlib sh-elf-vhex/bin/ranlib
-
-# Patch OpenLibM building error (which search for sh-elf-vhex-ar)
-ln -sf $(pwd)/../binutils/bin/sh-elf-vhex-ar sh-elf-vhex/bin/sh-elf-vhex-ar
-
+#---
 # Cache management
+#---
 
 if [[ "$cache" == 'false' ]]; then
    echo "$TAG Removing $ARCHIVE..."
-   rm -f $ARCHIVE
+   rm -f "$ARCHIVE"
 fi
+
 exit 0

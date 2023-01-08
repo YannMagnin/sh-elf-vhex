@@ -2,9 +2,9 @@
 
 verbose=false
 
-#
+#---
 # Help screen
-#
+#---
 help() {
   cat << OEF
 Script for the building step of binutils for the Vhex kernel.
@@ -20,9 +20,9 @@ OEF
 
 
 
-#
+#---
 # Parse arguments
-#
+#---
 
 for arg; do case "$arg" in
   --help | -h)          help;;
@@ -34,9 +34,11 @@ esac; done
 
 
 
-#
-# Building step
-#
+#---
+# Setup check
+#---
+
+source ../../scripts/utils.sh
 
 TAG='<sh-elf-vhex-binutils>'
 
@@ -56,20 +58,20 @@ fi
 cd ../../build/binutils/build
 
 
-# Import some helpers
-
-source ../../../scripts/utils.sh
 
 
+#---
 # Build part
+#---
 
 echo "$TAG Compiling binutils (usually 5-10 minutes)..."
 
 $quiet $make_cmd -j"$cores"
 
-echo "$TAG Installing to local folder..."
+echo "$TAG Installing binutils to sysroot..."
 
 $quiet $make_cmd install-strip
+
 
 # Indicate that the build is finished
 
