@@ -9,3 +9,8 @@ target    = [
 build     = 'make build'
 install   = 'make install'
 uninstall = 'make uninstall'
+
+[superh.env]
+VXSDK_PUBLIC_HOOK_CMAKE_TOOLCHAIN = [
+    '{VXSDK_CURRENT_SOURCE_DIR}/cmake/toolchain.cmake'
+]
