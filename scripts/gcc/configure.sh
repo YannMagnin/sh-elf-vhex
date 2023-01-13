@@ -91,6 +91,8 @@ if [[ -f "$existing_gcc" ]]; then
   existing_version=$($existing_gcc --version | head -n 1 | grep -Eo '[0-9.]+$')
   if [[ $existing_version == $VERSION ]]; then
     echo "$TAG Version $VERSION already installed, skipping rebuild"
+    mkdir -p ../../build/gcc/
+    touch ../../build/gcc/.fini
     exit 0
   fi
   [[ -d ../../build/gcc/build ]] && rm -rf ../../build/gcc/build
