@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-verbose=true
+verbose=false
 
 #---
 # Help screen
@@ -83,14 +83,14 @@ echo "$TAG Configuring GCC (stage 1)..."
 $quiet ../gcc/configure                 \
   --prefix="$SYSROOT"                   \
   --target='sh-elf-vhex'                \
+  --program-prefix="sh-elf-vhex-"       \
   --with-multilib-list='m3,m4-nofpu'    \
   --enable-languages='c'                \
   --without-headers                     \
-  --program-prefix="sh-elf-vhex-"       \
   --enable-lto                          \
+  --enable-shared                       \
   --disable-threads                     \
   --disable-nls                         \
-  --enable-shared                       \
   $extra_args
 
 echo "$TAG Compiling GCC (stage 1) (usually 10-20 minutes)..."
@@ -127,14 +127,13 @@ $quiet vxsdk -vvv build-superh ../fxlibc --verbose
 # Finish to build GCC
 #---
 
-echo "$TAG Compiling libgcc (stage 2)..."
+echo "$TAG Compiling libgcc (stage 1)..."
 
 $quiet $make_cmd -j"$cores" all-target-libgcc
 
-echo "$TAG Install libgcc (stage 2)..."
+echo "$TAG Install libgcc (stage 1)..."
 
 $quiet $make_cmd -j"$cores" install-strip-target-libgcc
-
 
 
 

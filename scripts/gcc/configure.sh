@@ -151,8 +151,10 @@ mv ./gcc-$VERSION/ ./gcc
 # Install dependencies
 #---
 
+echo "$TAG install dependencies..."
+
 cd gcc
-./contrib/download_prerequisites
+$quiet ./contrib/download_prerequisites
 cd ..
 
 mkdir -p build

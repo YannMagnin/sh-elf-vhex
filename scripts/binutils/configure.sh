@@ -213,9 +213,10 @@ echo "$TAG Configuring binutils..."
 $quiet ../binutils-$VERSION/configure \
   --prefix="$SYSROOT"                 \
   --target='sh-elf-vhex'              \
-  --with-multilib-list='m3,m4-nofpu'  \
   --program-prefix='sh-elf-vhex-'     \
+  --with-multilib-list='m3,m4-nofpu'  \
   --enable-lto                        \
+  --enable-shared                     \
   --disable-nls
 
 #---
