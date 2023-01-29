@@ -88,16 +88,19 @@ $quiet ../gcc/configure                 \
   --enable-languages='c'                \
   --without-headers                     \
   --enable-lto                          \
+  --enable-libssp                       \
+  --enable-libsanitizer                 \
   --enable-shared                       \
   --disable-threads                     \
+  --disable-default-ssp                 \
   --disable-nls                         \
   $extra_args
 
-echo "$TAG Compiling GCC (stage 1) (usually 10-20 minutes)..."
+echo "$TAG Compiling GCC (usually 10-20 minutes)..."
 
 $quiet $make_cmd -j"$cores" all-gcc
 
-echo "$TAG Install GCC (stage 1)..."
+echo "$TAG Install GCC..."
 
 $quiet $make_cmd -j"$cores" install-strip-gcc
 
@@ -127,15 +130,37 @@ $quiet vxsdk -vvv build-superh ../fxlibc --verbose
 # Finish to build GCC
 #---
 
-echo "$TAG Compiling libgcc (stage 1)..."
+echo "$TAG Compiling libgcc..."
 
 $quiet $make_cmd -j"$cores" all-target-libgcc
 
-echo "$TAG Install libgcc (stage 1)..."
+echo "$TAG Install libgcc..."
 
 $quiet $make_cmd -j"$cores" install-strip-target-libgcc
 
+echo "$TAG Compiling libssp..."
 
+$quiet $make_cmd -j"$cores" all-target-libssp
+
+echo "$TAG Install libssp..."
+
+$quiet $make_cmd -j"$cores" install-strip-target-libssp
+
+echo "$TAG Compiling LTO plugin..."
+
+$quiet $make_cmd -j"$cores" all-lto-plugin
+
+echo "$TAG Install LTO plugin..."
+
+$quiet $make_cmd -j"$cores" install-strip-lto-plugin
+
+echo "$TAG Compiling libsanitizer..."
+
+$quiet $make_cmd -j"$cores" all-target-libsanitizer
+
+echo "$TAG Install libsanitizer..."
+
+$quiet $make_cmd -j"$cores" install-strip-target-libsanitizer
 
 
 #---
