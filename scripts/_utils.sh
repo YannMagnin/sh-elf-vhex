@@ -1,8 +1,10 @@
 # module used to provide common variable / functions
-
-## workaround to trick the linter
+# this file must not be manually invoked
+#
+# @note
+# - workaround to trick the linter
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  verbose=false
+  verbose=$VHEX_VERBOSE
 fi
 
 #---
@@ -10,8 +12,8 @@ fi
 #---
 
 # select the appropriate quiet primitive
-quiet='run_normaly'
-[[ "$verbose" == "false" ]] && quiet='run_quietly vxsdk-build.log'
+quiet='utils_run_normaly'
+[[ "$verbose" == "false" ]] && quiet='utils_run_quietly vxsdk-build.log'
 export quiet
 
 # Number of processor cores
@@ -27,7 +29,7 @@ export make_cmd
 # Functions provided
 #---
 
-function run_normaly() {
+function utils_run_normaly() {
   echo "$@"
   if ! "$@"; then
     echo "$TAG error: command failed, abord"
@@ -35,7 +37,7 @@ function run_normaly() {
   fi
 }
 
-function run_quietly() {
+function utils_run_quietly() {
   out="$1"
   shift 1
   if ! "$@" >"$out" 2>&1; then
@@ -54,13 +56,12 @@ function utils_find_last_version() {
   echo "$_version"
 }
 
-function get_sysroot() {
-  if [ -z "${VHEX_PREFIX_SYSROOT}" ]; then
+function utils_get_env() {
+  if [ -v "$1" ]
+  then
     echo 'error: are you sure to use the bootstrap script ?' >&2
-    echo ' Missing sysroot information, abord' >&2
+    echo " Missing $2 information, abord" >&2
     exit 1
   fi
-  SYSROOT="${VHEX_PREFIX_SYSROOT/#\~/$HOME}"
-  mkdir -p "$SYSROOT"
-  echo "SYSROOT"
+  echo "${!1/#\~/$HOME}"
 }

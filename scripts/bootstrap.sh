@@ -21,12 +21,14 @@ Options:
 Notes:
 
   This script will use env variables:
+    VHEX_VERBOSE            - verbose status
     VHEX_VERSION_BINUTILS   - target version of BINUTILS
     VHEX_VERSION_GCC        - target version of GCC
     VHEX_PREFIX_INSTALL     - installation prefix
     VHEX_PREFIX_SYSROOT     - sysroot prefix
 
   Default value for each configuration:
+    VHEX_VERBOSE            - false
     VHEX_VERSION_BINUTILS   - lastest detected
     VHEX_VERSION_GCC        - lastest detected
     VHEX_PREFIX_INSTALL     - "~/.local/bin/"

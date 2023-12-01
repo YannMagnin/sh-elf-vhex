@@ -1,94 +1,61 @@
 #! /usr/bin/env bash
 
-verbose=false
-cache=true
-version='?'
-
 #---
 # Help screen
 #---
 
-help() {
-  cat << OEF
-Script for the configuration step of Vhex kernel's binutils.
+function help() {
+  cat << EOF
+Script for the configuration step of Vhex's binutils.
 
 Usage $0 [options...]
 
 Configurations:
   -h, --help            Display this help
   --cache               Keep the archive of binutils
-  --verbose             Display extra information during the configuration step
-  --version=<VERSION>   Select the binutils version. If '?' argument is passed,
-                          then all binutils version with Vhex patchs available
-                          will be displayed
-OEF
+EOF
   exit 0
 }
-
-
 
 #---
 # Parse arguments
 #---
 
-[[ $# -eq 0 ]] && help
-
-for arg; do case "$arg" in
-  --help | -h)          help;;
-  --verbose)            verbose=true;;
-  --cache)              cache=true;;
-  --version=*)          version=${arg#*=};;
-  *)
-    echo "error: unrecognized argument '$arg', giving up" >&2
-    exit 1
-esac; done
-
-
-#---
-# check version
-#---
-
-list_version=''
-for tmp in $(ls -d ../../patchs/binutils/*); do
-  list_version="$list_version $(basename $tmp)"
+cache=false
+for arg;
+  do case "$arg" in
+    --help | -h)    help;;
+    --cache)        cache=true;;
+    *)
+      echo "error: unrecognized argument '$arg', giving up" >&2
+      exit 1
+  esac
 done
-if [[ "$version" == '?' ]];  then
-  echo "Binutils available versions:"
-  for ver in $list_version; do
-    echo "  $ver"
-  done
-  exit 0
-fi
-if [[ ! $list_version =~ (^|[[:space:]])$version($|[[:space:]]) ]]; then
-  echo "binutils version '$version' is not supported by Vhex"
-  echo 'abording...'
-  exit 1
-fi
-
-# Import some helpers
-
-source ../../scripts/utils.sh
 
 #---
 # Configuration part
 #---
 
-TAG='<sh-elf-vhex-binutils>'
-VERSION=$version
+source ../../scripts/_utils.sh
+
+VERSION=$(utils_get_env 'VHEX_VERSION_BINUTILS' 'binutils')
+SYSROOT=$(utils_get_env 'VHEX_PREFIX_SYSROOT' 'sysroot')
 URL="https://ftp.gnu.org/gnu/binutils/binutils-$VERSION.tar.xz"
-ARCHIVE="/tmp/sh-elf-vhex/$(basename $URL)"
-SYSROOT="$(get_sysroot)"
+ARCHIVE="/tmp/sh-elf-vhex/$(basename "$URL")"
+TAG='<sh-elf-vhex-binutils>'
 
 #---
 # Avoid rebuilds of the same version
 #---
 
-existing_as="$SYSROOT/bin/sh-elf-vhex-as"
+as_bin="$SYSROOT/bin/sh-elf-vhex-as"
 
-if [[ -f "$existing_as" ]]; then
-  existing_version=$($existing_as --version | head -n 1 | grep -Eo '[0-9.]+$')
-  if [[ $existing_version == $VERSION ]]; then
-    echo "$TAG Version $VERSION already installed, skipping rebuild"
+if [[ -f "$as_bin" ]]
+then
+  as_version=$($as_bin --version | head -n 1 | grep -Eo '[0-9.]+$')
+  if [[ "$as_version" == "$VERSION" ]]
+  then
+    echo "$TAG Version $VERSION already installed, skipping rebuild" >&2
     mkdir -p ../../build/binutils/
     touch ../../build/binutils/.fini
     exit 0
@@ -98,28 +65,35 @@ if [[ -f "$existing_as" ]]; then
 fi
 
 #---
-# Check dependencies for binutils and GCC
+# Check dependencies for binutils and GCC and offer to install them
 #---
 
-if command -v pkg >/dev/null 2>&1; then
-  deps="cmake libmpfr libmpc libgmp libpng flex clang git texinfo libisl bison xz-utils"
-  pm=pkg
-  pm_has="dpkg -s"
-  pm_install="pkg install"
-elif command -v apt >/dev/null 2>&1; then
-  deps="cmake libmpfr-dev libmpc-dev libgmp-dev libpng-dev libppl-dev flex g++ git texinfo xz-utils"
-  pm=apt
-  pm_has="dpkg -s"
-  pm_install="sudo apt install"
-elif command -v dnf >/dev/null 2>&1; then
-  deps="cmake mpfr-devel libmpc-devel gmp-devel libpng-devel ppl-devel flex gcc git texinfo xz"
-  pm=dnf
+if command -v pkg >/dev/null 2>&1
+then
+  deps='cmake libmpfr libmpc libgmp libpng flex clang git texinfo'
+  deps="$deps libisl bison xz-utils"
+  pm='pkg'
+  pm_has='dpkg -s'
+  pm_install='pkg install'
+elif command -v apt >/dev/null 2>&1
+then
+  deps='cmake libmpfr-dev libmpc-dev libgmp-dev libpng-dev libppl-dev'
+  deps="$deps flex g++ git texinfo xz-utils"
+  pm='apt'
+  pm_has='dpkg -s'
+  pm_install='sudo apt install'
+elif command -v dnf >/dev/null 2>&1
+then
+  deps='cmake mpfr-devel libmpc-devel gmp-devel libpng-devel ppl-devel'
+  deps="$deps flex gcc git texinfo xz"
+  pm='dnf'
   pm_has="echo '$(rpm -qa)' | grep -i "
-  pm_install="sudo dnf install"
+  pm_install='sudo dnf install'
   fix='-'
-elif command -v pacman >/dev/null 2>&1; then
-  deps="cmake mpfr libmpc gmp libpng ppl flex gcc git texinfo xz"
-  pm=pacman
+elif command -v pacman >/dev/null 2>&1
+then
+  deps='cmake mpfr libmpc gmp libpng ppl flex gcc git texinfo xz'
+  pm='pacman'
   pm_has="pacman -Qi"
   pm_install="sudo pacman -S"
 else
@@ -135,17 +109,16 @@ if [[ -z "$trust_deps" ]]; then
   done
 fi
 
-#---
-# Offer to install dependencies
-#---
-
-if [[ ! -z "$missing" ]]; then
-  echo "$TAG Based on $pm, some dependencies are missing: $missing"
-  echo -n "$TAG Do you want to run '$pm_install $missing' to install them (Y/n)? "
-
-  read do_install
-  if [[ "$do_install" == "y" || "$do_install" == "Y" || "$do_install" == "" ]]; then
-    $pm_install $missing
+if [[ -n "$missing" ]]
+then
+  echo -en \
+    "$TAG Based on $pm, some dependencies are missing: $missing\n" \
+    "$TAG Do you want to run '$pm_install $missing' to install "   \
+    'them [nY]? '
+  read -r do_install
+  if [[ "$do_install" == "n" ]]
+  then
+    $pm_install "$missing"
   else
     echo "$TAG Skipping dependencies, hoping it will build anyway."
   fi
@@ -155,22 +128,24 @@ fi
 # Download archive
 #---
 
-if [[ "$cache" == 'false' ]]; then
-  if [[ -f "$ARCHIVE" ]]; then
-    rm -f "$ARCHIVE"
-  fi
-fi
-mkdir -p $(dirname "$ARCHIVE")
-if [[ -f "$ARCHIVE" ]]; then
+[[ "$cache" == 'false' && -f "$ARCHIVE" ]] && rm -f "$ARCHIVE"
+
+mkdir -p "$(dirname "$ARCHIVE")"
+if [[ -f "$ARCHIVE" ]]
+then
   echo "$TAG Found $ARCHIVE, skipping download"
 else
   echo "$TAG Downloading $URL..."
-  if command -v curl >/dev/null 2>&1; then
-    curl $URL -o $ARCHIVE
-  elif command -v wget >/dev/null 2>&1; then
-    wget -q --show-progress $URL -O $ARCHIVE
+  if command -v curl >/dev/null 2>&1
+  then
+    curl "$URL" -o "$ARCHIVE"
+  elif command -v wget >/dev/null 2>&1
+  then
+    wget -q --show-progress "$URL" -O "$ARCHIVE"
   else
-    echo "$TAG error: no curl or wget; install one or download archive yourself" >&2
+    echo \
+      "$TAG error: no curl or wget; install one or download "
+      'archive yourself' >&2
     exit 1
   fi
 fi
@@ -182,27 +157,25 @@ fi
 echo "$TAG Extracting $ARCHIVE..."
 
 mkdir -p ../../build/binutils/
-cd ../../build/binutils
+cd ../../build/binutils || exit 1
 
-unxz -c < $ARCHIVE | tar -xf -
+unxz -c < "$ARCHIVE" | tar -xf -
 
-
-# Touch intl/plural.c to avoid regenerating it from intl/plural.y with recent
-# versions of bison, which is subject to the following known bug.
+# Touch intl/plural.c to avoid regenerating it from intl/plural.y with
+# recent versions of bison, which is subject to the following known bug.
 # * https://sourceware.org/bugzilla/show_bug.cgi?id=22941
 # * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=92008
-touch binutils-$VERSION/intl/plural.c
+touch "binutils-$VERSION/intl/plural.c"
 
 # Apply binutils patchs for Vhex
 
 echo "$TAG Apply Vhex patchs..."
-cp -r ../../patchs/binutils/$VERSION/* ./binutils-$VERSION/
+cp -r "../../patchs/binutils/$VERSION/*" "./binutils-$VERSION/"
 
 # Create build folder
 
 [[ -d "build" ]] && rm -rf build
-mkdir build && cd build
-
+mkdir build && cd build || exit 1
 
 #---
 # Real configuration step
@@ -210,20 +183,21 @@ mkdir build && cd build
 
 echo "$TAG Configuring binutils..."
 
-$quiet ../binutils-$VERSION/configure \
-  --prefix="$SYSROOT"                 \
-  --target='sh-elf-vhex'              \
-  --program-prefix='sh-elf-vhex-'     \
-  --with-multilib-list='m3,m4-nofpu'  \
-  --enable-lto                        \
-  --enable-shared                     \
+$quiet "../binutils-$VERSION/configure" \
+  --prefix="$SYSROOT"                   \
+  --target='sh-elf-vhex'                \
+  --program-prefix='sh-elf-vhex-'       \
+  --with-multilib-list='m3,m4-nofpu'    \
+  --enable-lto                          \
+  --enable-shared                       \
   --disable-nls
 
 #---
 # Cache management
 #---
 
-if [[ "$cache" == 'false' ]]; then
+if [[ "$cache" == 'false' ]]
+then
   echo "$TAG Removing $ARCHIVE..."
   rm -f "$ARCHIVE"
 fi
