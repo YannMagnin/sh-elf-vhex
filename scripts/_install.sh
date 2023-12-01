@@ -7,7 +7,8 @@ prefix=
 #---
 # Help screen
 #---
-help() {
+
+function help() {
   cat << OEF
 Script for the installation step of binutils/GCC tools for the Vhex kernel.
 
@@ -21,9 +22,6 @@ Configurations:
 OEF
   exit 0
 }
-
-
-
 
 #---
 # Parse arguments
@@ -41,14 +39,11 @@ for arg; do case "$arg" in
     exit 1
 esac; done
 
-
-
-
 #---
 # Installation step
 #---
 
-source ../scripts/utils.sh
+source ../scripts/_utils.sh
 
 TAG='<sh-elf-vhex>'
 PREFIX="$prefix"
@@ -71,16 +66,11 @@ if [[ "$cache" == 'false' ]]; then
   rm -rf ../../build
 fi
 
-
-
-
 #---
 # Symbolic link executables to $PREFIX
 #---
 
 echo "$TAG Symlinking binaries..."
-
-cd "$SYSROOT/bin"
 
 mkdir -p "$PREFIX"
 for x in *; do
