@@ -36,7 +36,8 @@ done
 # Configuration part
 #---
 
-source ../../scripts/_utils.sh
+_src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source "$_src/../_utils.sh"
 
 VERSION=$(utils_get_env 'VHEX_VERSION_BINUTILS' 'binutils')
 SYSROOT=$(utils_get_env 'VHEX_PREFIX_SYSROOT' 'sysroot')

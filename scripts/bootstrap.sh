@@ -42,8 +42,6 @@ OEF
 # Parse arguments
 #---
 
-[[ $# -eq 0 ]] && help
-
 action='install'
 VHEX_VERBOSE=false
 VHEX_PREFIX_INSTALL=~/.local/bin
@@ -67,7 +65,6 @@ done
 # Preliminary check
 #---
 
-_src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 if [ -d "$VHEX_PREFIX_CLONE" ]; then
   echo "It seems that the project is already existing :pouce:" >&2
@@ -77,7 +74,8 @@ if [ -d "$VHEX_PREFIX_CLONE" ]; then
   exit 1
 fi
 
-source ./_utils.sh
+_src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source "$_src/_utils.sh"
 
 VHEX_VERSION_GCC=$(utils_find_last_version "$_src/../patchs/gcc")
 VHEX_VERSION_BINUTILS=$(utils_find_last_version "$_src/../patchs/binutils")
@@ -128,10 +126,10 @@ export VHEX_PREFIX_CLONE
 if [[ "$action" == 'install' ]]
 then
   ./scripts/binutils/configure.sh
-  #./scripts/binutils/build.sh
-  #./scripts/gcc/configure.sh
-  #./scripts/gcc/build.sh
-  #./scripts/_install.sh
+  ./scripts/binutils/build.sh
+  ./scripts/gcc/configure.sh
+  ./scripts/gcc/build.sh
+  ./scripts/_install.sh
 else
   ./scripts/_uninstall.sh
 fi

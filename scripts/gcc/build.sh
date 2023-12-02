@@ -44,7 +44,8 @@ done
 #  rebuild GCC with, this time, the shared version of the libgcc.
 #---
 
-source ../../scripts/_utils.sh
+_src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source "$_src/../_utils.sh"
 
 TAG='<sh-elf-vhex-gcc>'
 SYSROOT=$(utils_get_env 'VHEX_PREFIX_SYSROOT' 'sysroot')
@@ -106,6 +107,8 @@ $quiet $make_cmd -j"$cores" install-strip-gcc
 export PATH="$PATH:$SYSROOT/bin"
 
 echo "$TAG Building Vhex's custom C standard library..."
+echo 'Not implemented yet'
+exit 1
 
 # (todo) : clone the vxlibc in local
 # (todo) : build

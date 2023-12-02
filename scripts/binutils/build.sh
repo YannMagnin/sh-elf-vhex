@@ -5,14 +5,14 @@
 #---
 
 function help() {
-  cat << OEF
+  cat << EOF
 Script for the building step of binutils for the Vhex kernel.
 
 Usage $0 [options...]
 
 Configurations:
   -h, --help            Display this help
-OEF
+EOF
   exit 0
 }
 
@@ -33,7 +33,8 @@ done
 # Setup check
 #---
 
-source ../../scripts/_utils.sh
+_src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source "$_src/../_utils.sh"
 
 TAG='<sh-elf-vhex-binutils>'
 
