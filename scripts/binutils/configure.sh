@@ -37,13 +37,17 @@ done
 #---
 
 _src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-source "$_src/../_utils.sh"
+cd "$_src" || exit 1
+source ../_utils.sh
 
 VERSION=$(utils_get_env 'VHEX_VERSION_BINUTILS' 'binutils')
 SYSROOT=$(utils_get_env 'VHEX_PREFIX_SYSROOT' 'sysroot')
 URL="https://ftp.gnu.org/gnu/binutils/binutils-$VERSION.tar.xz"
 ARCHIVE="/tmp/sh-elf-vhex/$(basename "$URL")"
 TAG='<sh-elf-vhex-binutils>'
+
+echo "$TAG Target binutils version -> $VERSION"
+echo "$TAG Sysroot found -> $SYSROOT"
 
 #---
 # Avoid rebuilds of the same version
@@ -101,7 +105,7 @@ else
   trust_deps=1
 fi
 
-missing=""
+missing=''
 if [[ -z "$trust_deps" ]]; then
   for d in $deps; do
     if ! bash -c "$pm_has $d$fix" >/dev/null 2>&1; then
@@ -117,9 +121,9 @@ then
     "$TAG Do you want to run '$pm_install $missing' to install "   \
     'them [nY]? '
   read -r do_install
-  if [[ "$do_install" == "n" ]]
+  if [[ "$do_install" != 'n' ]]
   then
-    $pm_install "$missing"
+    bash -c "$pm_install $missing"
   else
     echo "$TAG Skipping dependencies, hoping it will build anyway."
   fi
@@ -157,8 +161,8 @@ fi
 
 echo "$TAG Extracting $ARCHIVE..."
 
-mkdir -p ../../build/binutils/
-cd ../../build/binutils || exit 1
+mkdir -p ../../build/binutils
+cd ../../build/binutils/ || exit 1
 
 unxz -c < "$ARCHIVE" | tar -xf -
 
@@ -171,7 +175,7 @@ touch "binutils-$VERSION/intl/plural.c"
 # Apply binutils patchs for Vhex
 
 echo "$TAG Apply Vhex patchs..."
-cp -r "../../patchs/binutils/$VERSION/*" "./binutils-$VERSION/"
+cp -r "$_src/../../patches/binutils/$VERSION"/* ./binutils-"$VERSION"/
 
 # Create build folder
 

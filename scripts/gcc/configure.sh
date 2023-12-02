@@ -37,13 +37,17 @@ done
 #---
 
 _src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-source "$_src/../_utils.sh"
+cd "$_src" || exit 1
+source ../_utils.sh
 
 VERSION=$(utils_get_env 'VHEX_VERSION_GCC' 'binutils')
 SYSROOT=$(utils_get_env 'VHEX_PREFIX_SYSROOT' 'sysroot')
 URL="https://ftp.gnu.org/gnu/gcc/gcc-$VERSION/gcc-$VERSION.tar.xz"
 ARCHIVE="/tmp/sh-elf-vhex/$(basename "$URL")"
 TAG='<sh-elf-vhex-gcc>'
+
+echo "$TAG Target gcc version -> $VERSION"
+echo "$TAG Sysroot found -> $SYSROOT"
 
 #---
 # Avoid rebuilds of the same version
@@ -106,7 +110,7 @@ unxz -c < "$ARCHIVE" | tar -xf -
 #---
 
 echo "$TAG Apply Vhex patchs..."
-cp -r "../../patchs/gcc/$VERSION/*" "./gcc-$VERSION/"
+cp -r "../../patches/gcc/$VERSION"/* "./gcc-$VERSION"/
 
 # Rename the extracted directory to avoid path deduction during building
 # step (so the build script will use explicitly ...build/gcc/... path)

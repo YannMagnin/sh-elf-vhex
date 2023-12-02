@@ -38,14 +38,15 @@ done
 #  building our own standard C library, which require openlibm and the
 #  static version of the libgcc.
 #
-#   To avoid this circular dependency, we shall build the GCC tools with the
-#  static version of the libgcc. This will enable us to compile the
+#   To avoid this circular dependency, we shall build the GCC tools with
+#  the static version of the libgcc. This will enable us to compile the
 #  openlibm, then our custom C standard library. After that, we will
 #  rebuild GCC with, this time, the shared version of the libgcc.
 #---
 
 _src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-source "$_src/../_utils.sh"
+cd "$_src" || exit 1
+source ../_utils.sh
 
 TAG='<sh-elf-vhex-gcc>'
 SYSROOT=$(utils_get_env 'VHEX_PREFIX_SYSROOT' 'sysroot')
@@ -73,7 +74,7 @@ cd ../../build/gcc/build || exit 1
 
 echo "$TAG Configuring GCC (stage 1)..."
 
-# Configure GCC stage-1 (force disable shared version of the libgcc)
+# Configure GCC stage-1 (minimal build as possible for library)
 
 $quiet ../gcc/configure                 \
   --prefix="$SYSROOT"                   \

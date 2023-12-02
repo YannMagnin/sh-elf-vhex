@@ -9,7 +9,7 @@ prefix=
 #---
 
 function help() {
-  cat << OEF
+  cat << EOF
 Script for the installation step of binutils/GCC tools for the Vhex kernel.
 
 Usage $0 [options...]
@@ -17,9 +17,7 @@ Usage $0 [options...]
 Configurations:
   -h, --help            Display this help
   --cache               Keep the build and the sources directory
-  --verbose             Display extra information during the installation step
-  --prefix=<PREFIX>     Installation prefix
-OEF
+EOF
   exit 0
 }
 
@@ -27,33 +25,32 @@ OEF
 # Parse arguments
 #---
 
-[[ $# -eq 0 ]] && help
-
-for arg; do case "$arg" in
-  --help | -h)          help;;
-  --verbose)            verbose=true;;
-  --cache)              cache=true;;
-  --prefix=*)           prefix=${arg#*=};;
-  *)
-    echo "error: unreconized argument '$arg', giving up." >&2
-    exit 1
-esac; done
+for arg
+  do case "$arg" in
+    --help | -h)    help;;
+    --cache)        cache=true;;
+    *)
+      echo "error: unreconized argument '$arg', giving up." >&2
+      exit 1
+  esac
+done
 
 #---
 # Installation step
 #---
 
-source ../scripts/_utils.sh
+_src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+cd "$_src" || exit 1
+source ./_utils.sh
 
 TAG='<sh-elf-vhex>'
-PREFIX="$prefix"
-SYSROOT="$(get_sysroot)"
+SYSROOT=$(utils_get_env 'VHEX_PREFIX_SYSROOT' 'sysroot')
+INSTALL=$(utils_get_env 'VHEX_PREFIX_INSTALL' 'install')
 
 # Check that all tools has been generated
 
-existing_gcc="$SYSROOT/bin/sh-elf-vhex-gcc"
-
-if [[ ! -f "$existing_gcc" ]]; then
+if [[ ! -f "$SYSROOT/bin/sh-elf-vhex-gcc" ]]
+then
   echo "error: Are you sure to have built sh-elf-vhex ? it seems that" >&2
   echo "  the 'as' tool is missing..." >&2
   exit 1
@@ -61,7 +58,8 @@ fi
 
 # Cleanup build files
 
-if [[ "$cache" == 'false' ]]; then
+if [[ "$cache" == 'false' ]]
+then
   echo "$TAG Cleaning up build files..."
   rm -rf ../../build
 fi
@@ -72,7 +70,7 @@ fi
 
 echo "$TAG Symlinking binaries..."
 
-mkdir -p "$PREFIX"
-for x in *; do
-  ln -sf "$SYSROOT/bin/$x" "$PREFIX/$x"
+mkdir -p "$INSTALL"
+for x in "$SYSROOT/bin"/*; do
+  ln -s "$x" "$INSTALL/$x"
 done

@@ -34,7 +34,8 @@ done
 #---
 
 _src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-source "$_src/../_utils.sh"
+cd "$_src" || exit 1
+source ../_utils.sh
 
 TAG='<sh-elf-vhex-binutils>'
 

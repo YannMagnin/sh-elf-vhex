@@ -65,7 +65,6 @@ done
 # Preliminary check
 #---
 
-
 if [ -d "$VHEX_PREFIX_CLONE" ]; then
   echo "It seems that the project is already existing :pouce:" >&2
   echo \
@@ -77,12 +76,13 @@ fi
 _src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 source "$_src/_utils.sh"
 
-VHEX_VERSION_GCC=$(utils_find_last_version "$_src/../patchs/gcc")
-VHEX_VERSION_BINUTILS=$(utils_find_last_version "$_src/../patchs/binutils")
+VHEX_VERSION_GCC=$(utils_find_last_version "$_src/../patches/gcc")
+VHEX_VERSION_BINUTILS=$(utils_find_last_version "$_src/../patches/binutils")
 
 if [[ "$VHEX_VERBOSE" == 'true' ]]
 then
   echo "Debug fetched information:"
+  echo " - VHEX_VERBOSE          = $VHEX_VERBOSE"
   echo " - VHEX_VERSION_BINUTILS = $VHEX_VERSION_BINUTILS"
   echo " - VHEX_VERSION_GCC      = $VHEX_VERSION_GCC"
   echo " - VHEX_PREFIX_INSTALL   = $VHEX_PREFIX_INSTALL"
@@ -114,6 +114,7 @@ git clone \
   --depth=1 \
   https://github.com/YannMagnin/sh-elf-vhex.git \
   "$VHEX_PREFIX_CLONE"
+
 cd "$VHEX_PREFIX_CLONE" || exit 1
 
 export VHEX_VERSION_BINUTILS
@@ -123,17 +124,28 @@ export VHEX_PREFIX_INSTALL
 export VHEX_PREFIX_SYSROOT
 export VHEX_PREFIX_CLONE
 
+success='true'
 if [[ "$action" == 'install' ]]
 then
-  ./scripts/binutils/configure.sh
-  ./scripts/binutils/build.sh
-  ./scripts/gcc/configure.sh
-  ./scripts/gcc/build.sh
-  ./scripts/_install.sh
+  ./scripts/binutils/configure.sh \
+  && ./scripts/binutils/build.sh \
+  && ./scripts/gcc/configure.sh \
+  && ./scripts/gcc/build.sh \
+  && ./scripts/_install.sh \
+  || success='false'
+  if [[ "$success" == 'true' ]]
+  then
+      echo 'Error during bootstraping operation' >&2
+      exit 1
+  fi
+  echo 'Successfully installed sh-elf-vhex !'
+  echo "Do not forget to export the binary path '$VHEX_PREFIX_INSTALL'"
 else
-  ./scripts/_uninstall.sh
+  ./scripts/_uninstall.sh || success='false'
+  if [[ "$success" != 'true' ]]
+  then
+    echo 'Error during unstallation step, abord' >&2
+    exit 1
+  fi
+  echo 'Successfully uninstalled sh-elf-vhex'
 fi
-
-echo 'Successfully installed sh-elf-vhex !'
-echo "Do not forget to export the binary path '$VHEX_PREFIX_INSTALL'"
-exit 0
