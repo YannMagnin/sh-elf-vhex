@@ -39,20 +39,20 @@ source ../_utils.sh
 
 # Avoid rebuilds and error
 
-if [[ -f ../../build/binutils/.fini  ]]
+if [[ -f ../../_build/binutils/.fini  ]]
 then
   echo "$TAG already build, skipping rebuild"
   exit 0
 fi
 
-if [[ ! -d ../../build/binutils/build ]]
+if [[ ! -d ../../_build/binutils/build ]]
 then
   echo "error: Are you sure to have configured binutils ? it seems that" >&2
   echo "  the build directory is missing..." >&2
   exit 1
 fi
 
-cd ../../build/binutils/build || exit 1
+cd ../../_build/binutils/build || exit 1
 
 #---
 # Build part

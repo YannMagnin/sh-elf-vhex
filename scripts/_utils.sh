@@ -55,3 +55,47 @@ function utils_makecmd()
       || make_cmd='make'
   utils_callcmd "$make_cmd" "-j$cores" "$@"
 }
+
+function utils_archive_download()
+{
+  url=$1
+  output=$2
+  cached=$3
+  archive="/tmp/sh-elf-vhex/$(basename "$url")"
+
+  if [[ -d "$output/archive" ]]
+  then
+    echo "$TAG Found archive, skipping download"
+    exit 0
+  fi
+
+  if ! test -f "$archive"
+  then
+    echo "$TAG Downloading $url..."
+    mkdir -p "$(dirname "$archive")"
+    if command -v curl >/dev/null 2>&1
+    then
+      curl "$url" -o "$archive"
+    elif command -v wget >/dev/null 2>&1
+    then
+      wget -q --show-progress "$url" -O "$archive"
+    else
+      echo \
+        "$TAG error: no curl or wget; install one or download " \
+        "archive yourself at '$archive'" >&2
+      exit 1
+    fi
+  fi
+
+  echo "$TAG Extracting $archive..."
+
+  mkdir -p "$output/archive" && pushd "$output/archive" > /dev/null || exit 1
+  unxz -c < "$archive" | tar --strip-components 1 -xf -
+  popd > /dev/null || exit 1
+
+  if [[ "$cached" != 'true' ]]
+  then
+    echo "$TAG Removing $archive..."
+    rm -f "$archive"
+  fi
+}

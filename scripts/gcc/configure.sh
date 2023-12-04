@@ -21,15 +21,15 @@ EOF
 # Parse arguments
 #---
 
-cache=false
+cached='true'
 prefix_sysroot=
 version=
 verbose=
 for arg
   do case "$arg" in
     --help | -h)        help;;
-    --verbose | -v)     verbose=true;;
-    --cache)            cache=true;;
+    --verbose | -v)     verbose='true';;
+    --no-cache)         cached='true';;
     --prefix-sysroot=*) prefix_sysroot=${arg#*=};;
     --version=*)        version=${arg#*=};;
     *)
@@ -54,9 +54,6 @@ fi
 
 [[ "$verbose" == 'true' ]] && export VERBOSE=1
 
-url="https://ftp.gnu.org/gnu/gcc/gcc-$version/gcc-$version.tar.xz"
-archive="/tmp/sh-elf-vhex/$(basename "$url")"
-
 echo "$TAG Target gcc version -> $version"
 echo "$TAG Sysroot found -> $prefix_sysroot"
 
@@ -72,65 +69,40 @@ then
   if [[ "$gcc_version" == "$version" ]]
   then
     echo "$TAG Version $version already installed, skipping rebuild"
-    mkdir -p ../../build/gcc/
-    touch ../../build/gcc/.fini
+    mkdir -p ../../_build/gcc/
+    touch ../../_build/gcc/.fini
     exit 0
   fi
-  [[ -d ../../build/gcc/build ]] && rm -rf ../../build/gcc/build
-  [[ -f ../../build/gcc/.fini ]] && rm -f  ../../build/gcc/.fini
+  [[ -d ../../_build/gcc/build ]] && rm -rf ../../_build/gcc/build
+  [[ -f ../../_build/gcc/.fini ]] && rm -f  ../../_build/gcc/.fini
 fi
 
 #---
 # Download archive
 #---
 
-mkdir -p "$(dirname "$archive")"
-if [[ -f "$archive" ]]
-then
-  echo "$TAG Found $archive, skipping download"
-else
-  echo "$TAG Downloading $url..."
-  if command -v curl >/dev/null 2>&1
-  then
-    curl "$url" -o "$archive"
-  elif command -v wget >/dev/null 2>&1
-  then
-    wget -q --show-progress "$url" -O "$archive"
-  else
-    echo \
-      "$TAG error: no curl or wget; install one or download archive " \
-      ' yourself' >&2
-    exit 1
-  fi
-fi
+utils_archive_download \
+  "https://ftp.gnu.org/gnu/gcc/gcc-$version/gcc-$version.tar.xz" \
+  ../../_build/gcc \
+  "$cached"
 
 #---
-# Extract archive (openBSD-compliant version)
+# Patch sources
 #---
 
-echo "$TAG Extracting $archive..."
-
-mkdir -p ../../build/gcc && cd ../../build/gcc/ || exit 1
-
-unxz -c < "$archive" | tar -xf -
-
-#---
-# Apply GCC patchs for Vhex
-#---
+cd ../../_build/gcc || exit 1
 
 echo "$TAG Apply Vhex patchs..."
-cp -r "../../patches/gcc/$version"/* "./gcc-$version"/
+cp -r "../../patches/gcc/$version"/* ./archive/
 
-# Rename the extracted directory to avoid path deduction during building
-# step (so the build script will use explicitly ...build/gcc/... path)
-
-[[ -d ./gcc ]] && rm -rf ./gcc
-mv "./gcc-$version/" ./gcc
-
-# also store the sysroot prefix to avoid different CLI between binutils and
-# gcc
+# Store the sysroot prefix to avoid different CLI between binutils and gcc
 
 echo "$prefix_sysroot" > ./sysroot_info.txt
+
+# Create build folder
+
+[[ -d "./build" ]] && rm -rf build
+mkdir ./build
 
 #---
 # Install dependencies
@@ -138,18 +110,5 @@ echo "$prefix_sysroot" > ./sysroot_info.txt
 
 echo "$TAG install dependencies..."
 
-cd gcc || exit 1
+cd ./archive || exit 1
 utils_callcmd ./contrib/download_prerequisites
-cd .. || exit 1
-
-mkdir -p build
-
-#---
-# Cache management
-#---
-
-if [[ "$cache" == 'false' ]]
-then
-   echo "$TAG Removing $archive..."
-   rm -f "$archive"
-fi

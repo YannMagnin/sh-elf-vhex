@@ -13,7 +13,7 @@ Usage $0 [options...]
 Configurations:
   -h, --help            Display this help
   -v, --verbose         Display extra information during operation
-      --cache           Keep the archive of binutils
+      --no-cache        Do not keep the archive of binutils
       --prefix-sysroot  Sysroot (lib, header, ...) prefix
       --version         Binutils version
 EOF
@@ -24,16 +24,16 @@ EOF
 # Parse arguments
 #---
 
-cache=false
+cached='true'
 prefix_sysroot=
 version=
 for arg;
   do case "$arg" in
     --help | -h)        help;;
-    --verbose | -v)     verbose=true;;
+    --verbose | -v)     verbose='true';;
     --prefix-sysroot=*) prefix_sysroot=${arg#*=};;
     --version=*)        version=${arg#*=};;
-    --cache)            cache=true;;
+    --no-cache)         cached='false';;
     *)
       echo "error: unrecognized argument '$arg', giving up" >&2
       exit 1
@@ -56,9 +56,6 @@ fi
 
 [[ "$verbose" == 'true' ]] && export VERBOSE=1
 
-url="https://ftp.gnu.org/gnu/binutils/binutils-$version.tar.xz"
-archive="/tmp/sh-elf-vhex/$(basename "$url")"
-
 echo "$TAG Target binutils version -> $version"
 echo "$TAG Sysroot found -> $prefix_sysroot"
 
@@ -74,12 +71,12 @@ then
   if [[ "$as_version" == "$version" ]]
   then
     echo "$TAG Version '$version' already installed, skipping rebuild" >&2
-    mkdir -p ../../build/binutils/
-    touch ../../build/binutils/.fini
+    mkdir -p ../../_build/binutils/
+    touch ../../_build/binutils/.fini
     exit 0
   fi
-  [[ -d ../../build/binutils/build ]] && rm -rf ../../build/binutils/build
-  [[ -f ../../build/binutils/.fini ]] && rm -f  ../../build/binutils/.fini
+  [[ -d ../../_build/binutils/build ]] && rm -rf ../../_build/binutils/build
+  [[ -f ../../_build/binutils/.fini ]] && rm -f  ../../_build/binutils/.fini
 fi
 
 #---
@@ -146,47 +143,27 @@ fi
 # Download archive
 #---
 
-mkdir -p "$(dirname "$archive")"
-if [[ -f "$archive" ]]
-then
-  echo "$TAG Found $archive, skipping download"
-else
-  echo "$TAG Downloading $url..."
-  if command -v curl >/dev/null 2>&1
-  then
-    curl "$url" -o "$archive"
-  elif command -v wget >/dev/null 2>&1
-  then
-    wget -q --show-progress "$url" -O "$archive"
-  else
-    echo \
-      "$TAG error: no curl or wget; install one or download "
-      'archive yourself' >&2
-    exit 1
-  fi
-fi
+utils_archive_download \
+  "https://ftp.gnu.org/gnu/binutils/binutils-$version.tar.xz" \
+  ../../_build/binutils \
+  "$cached"
 
 #---
-# Extract archive (OpenBDS-compliant version)
+# Patch sources
 #---
 
-echo "$TAG Extracting $archive..."
-
-mkdir -p ../../build/binutils
-cd ../../build/binutils/ || exit 1
-
-unxz -c < "$archive" | tar -xf -
+cd ../../_build/binutils || exit 1
 
 # Touch intl/plural.c to avoid regenerating it from intl/plural.y with
 # recent versions of bison, which is subject to the following known bug.
 # * https://sourceware.org/bugzilla/show_bug.cgi?id=22941
 # * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=92008
-touch "binutils-$version/intl/plural.c"
+touch ./archive/intl/plural.c
 
 # Apply binutils patchs for Vhex
 
 echo "$TAG Apply Vhex patchs..."
-cp -r "$_src/../../patches/binutils/$version"/* ./binutils-"$version"/
+cp -r "$_src/../../patches/binutils/$version"/* ./archive/
 
 # Create build folder
 
@@ -200,7 +177,7 @@ mkdir build && cd build || exit 1
 echo "$TAG Configuring binutils..."
 
 utils_callcmd \
-  "../binutils-$version/configure"      \
+  ../archive/configure                  \
   --prefix="$prefix_sysroot"            \
   --target='sh-elf-vhex'                \
   --program-prefix='sh-elf-vhex-'       \
@@ -208,13 +185,3 @@ utils_callcmd \
   --enable-lto                          \
   --enable-shared                       \
   --disable-nls
-
-#---
-# Cache management
-#---
-
-if [[ "$cache" == 'false' ]]
-then
-  echo "$TAG Removing $archive..."
-  rm -f "$archive"
-fi

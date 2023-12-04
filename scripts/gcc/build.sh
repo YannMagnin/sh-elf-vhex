@@ -37,23 +37,23 @@ _src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd "$_src" || exit 1
 source ../_utils.sh
 
-if ! test -d ../../build/gcc || ! test -f ../../build/gcc/sysroot_info.txt
+if ! test -d ../../_build/gcc || ! test -f ../../_build/gcc/sysroot_info.txt
 then
   echo 'error: Are you sure to have built GCC ? it seems that' >&2
   echo '  the build directory is missing...' >&2
   exit 1
 fi
-prefix_sysroot=$(cat ../../build/gcc/sysroot_info.txt)
+prefix_sysroot=$(cat ../../_build/gcc/sysroot_info.txt)
 
 
-if [[ -f ../../build/gcc/.fini ]]
+if [[ -f ../../_build/gcc/.fini ]]
 then
   echo "$TAG already build, skipping rebuild"
   exit 0
 fi
 
 
-cd ../../build/gcc/build || exit 1
+cd ../../_build/gcc/build || exit 1
 
 #---
 # Build GCC stage-1
@@ -64,7 +64,7 @@ echo "$TAG Configuring GCC (stage 1)..."
 # Configure GCC stage-1 (minimal build as possible for library)
 
 utils_callcmd \
-  ../gcc/configure                      \
+  ../archive/configure                  \
   --prefix="$prefix_sysroot"            \
   --target='sh-elf-vhex'                \
   --program-prefix="sh-elf-vhex-"       \

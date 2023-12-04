@@ -99,13 +99,13 @@ if [[ "$valid" != 'y' ]]; then
   exit 1
 fi
 
-[[ -d "$prefix_clone" ]]   && rm -rf "$prefix_clone"
 [[ "$verbose" == 'true' ]] && export VERBOSE=1
 
 #---
 # Perform install operation
 #---
 
+[[ -d "$prefix_clone" ]] && rm -rf "$prefix_clone"
 utils_callcmd \
   git \
   clone \
