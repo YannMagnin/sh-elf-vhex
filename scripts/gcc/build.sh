@@ -108,12 +108,14 @@ $quiet $make_cmd -j"$cores" install-strip-gcc
 export PATH="$PATH:$SYSROOT/bin"
 
 echo "$TAG Building Vhex's custom C standard library..."
-echo 'Not implemented yet'
-exit 1
 
-# (todo) : clone the vxlibc in local
-# (todo) : build
-# (todo) : install
+$quiet \
+  git clone https://github.com/YannMagnin/vxLibc.git --depth 1 ../../_vxlibc
+
+../../_vxlibc/scripts/install.sh \
+    --prefix-sysroot="$SYSROOT/sh-elf-vhex/"  \
+    --yes                        \
+    || exit 1
 
 #---
 # Finish to build GCC
