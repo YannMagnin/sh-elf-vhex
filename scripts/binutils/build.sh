@@ -37,8 +37,6 @@ _src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd "$_src" || exit 1
 source ../_utils.sh
 
-TAG='<sh-elf-vhex-binutils>'
-
 # Avoid rebuilds and error
 
 if [[ -f ../../build/binutils/.fini  ]]
@@ -62,13 +60,12 @@ cd ../../build/binutils/build || exit 1
 
 echo "$TAG Compiling binutils (usually 5-10 minutes)..."
 
-$quiet $make_cmd -j"$cores"
+utils_makecmd
 
 echo "$TAG Installing binutils to sysroot..."
 
-$quiet $make_cmd install-strip
+utils_makecmd install-strip
 
 # Indicate that the build is finished
 
 touch ../.fini
-exit 0

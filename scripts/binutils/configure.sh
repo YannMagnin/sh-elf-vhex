@@ -12,7 +12,10 @@ Usage $0 [options...]
 
 Configurations:
   -h, --help            Display this help
-  --cache               Keep the archive of binutils
+  -v, --verbose         Display extra information during operation
+      --cache           Keep the archive of binutils
+      --prefix-sysroot  Sysroot (lib, header, ...) prefix
+      --version         Binutils version
 EOF
   exit 0
 }
@@ -22,10 +25,15 @@ EOF
 #---
 
 cache=false
+prefix_sysroot=
+version=
 for arg;
   do case "$arg" in
-    --help | -h)    help;;
-    --cache)        cache=true;;
+    --help | -h)        help;;
+    --verbose | -v)     verbose=true;;
+    --prefix-sysroot=*) prefix_sysroot=${arg#*=};;
+    --version=*)        version=${arg#*=};;
+    --cache)            cache=true;;
     *)
       echo "error: unrecognized argument '$arg', giving up" >&2
       exit 1
@@ -40,27 +48,32 @@ _src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd "$_src" || exit 1
 source ../_utils.sh
 
-VERSION=$(utils_get_env 'VHEX_VERSION_BINUTILS' 'binutils')
-SYSROOT=$(utils_get_env 'VHEX_PREFIX_SYSROOT' 'sysroot')
-URL="https://ftp.gnu.org/gnu/binutils/binutils-$VERSION.tar.xz"
-ARCHIVE="/tmp/sh-elf-vhex/$(basename "$URL")"
-TAG='<sh-elf-vhex-binutils>'
+if [[ ! -d "../../patches/binutils/$version" ]]
+then
+  echo "Binutils version '$version' not supported, abort" >&2
+  exit 1
+fi
 
-echo "$TAG Target binutils version -> $VERSION"
-echo "$TAG Sysroot found -> $SYSROOT"
+[[ "$verbose" == 'true' ]] && export VERBOSE=1
+
+url="https://ftp.gnu.org/gnu/binutils/binutils-$version.tar.xz"
+archive="/tmp/sh-elf-vhex/$(basename "$url")"
+
+echo "$TAG Target binutils version -> $version"
+echo "$TAG Sysroot found -> $prefix_sysroot"
 
 #---
 # Avoid rebuilds of the same version
 #---
 
-as_bin="$SYSROOT/bin/sh-elf-vhex-as"
+as_bin="$prefix_sysroot/bin/sh-elf-vhex-as"
 
-if [[ -f "$as_bin" ]]
+if test -f "$as_bin"
 then
   as_version=$($as_bin --version | head -n 1 | grep -Eo '[0-9.]+$')
-  if [[ "$as_version" == "$VERSION" ]]
+  if [[ "$as_version" == "$version" ]]
   then
-    echo "$TAG Version $VERSION already installed, skipping rebuild" >&2
+    echo "$TAG Version '$version' already installed, skipping rebuild" >&2
     mkdir -p ../../build/binutils/
     touch ../../build/binutils/.fini
     exit 0
@@ -79,28 +92,28 @@ then
   deps="$deps libisl bison xz-utils"
   pm='pkg'
   pm_has='dpkg -s'
-  pm_install='pkg install'
+  pm_install='ASSUME_ALWAYS_YES=yes pkg install'
 elif command -v apt >/dev/null 2>&1
 then
   deps='cmake libmpfr-dev libmpc-dev libgmp-dev libpng-dev libppl-dev'
   deps="$deps flex g++ git texinfo xz-utils"
   pm='apt'
   pm_has='dpkg -s'
-  pm_install='sudo apt install'
+  pm_install='sudo apt install -y'
 elif command -v dnf >/dev/null 2>&1
 then
   deps='cmake mpfr-devel libmpc-devel gmp-devel libpng-devel ppl-devel'
   deps="$deps flex gcc git texinfo xz"
   pm='dnf'
-  pm_has="echo '$(rpm -qa)' | grep -i "
-  pm_install='sudo dnf install'
+  pm_has="echo '$(rpm -qa)' | grep -i"
+  pm_install='sudo dnf install -y'
   fix='-'
 elif command -v pacman >/dev/null 2>&1
 then
   deps='cmake mpfr libmpc gmp libpng ppl flex gcc git texinfo xz'
   pm='pacman'
-  pm_has="pacman -Qi"
-  pm_install="sudo pacman -S"
+  pm_has='pacman -Qi'
+  pm_install='sudo pacman -S --noconfirm'
 else
   trust_deps=1
 fi
@@ -133,20 +146,18 @@ fi
 # Download archive
 #---
 
-[[ "$cache" == 'false' && -f "$ARCHIVE" ]] && rm -f "$ARCHIVE"
-
-mkdir -p "$(dirname "$ARCHIVE")"
-if [[ -f "$ARCHIVE" ]]
+mkdir -p "$(dirname "$archive")"
+if [[ -f "$archive" ]]
 then
-  echo "$TAG Found $ARCHIVE, skipping download"
+  echo "$TAG Found $archive, skipping download"
 else
-  echo "$TAG Downloading $URL..."
+  echo "$TAG Downloading $url..."
   if command -v curl >/dev/null 2>&1
   then
-    curl "$URL" -o "$ARCHIVE"
+    curl "$url" -o "$archive"
   elif command -v wget >/dev/null 2>&1
   then
-    wget -q --show-progress "$URL" -O "$ARCHIVE"
+    wget -q --show-progress "$url" -O "$archive"
   else
     echo \
       "$TAG error: no curl or wget; install one or download "
@@ -159,23 +170,23 @@ fi
 # Extract archive (OpenBDS-compliant version)
 #---
 
-echo "$TAG Extracting $ARCHIVE..."
+echo "$TAG Extracting $archive..."
 
 mkdir -p ../../build/binutils
 cd ../../build/binutils/ || exit 1
 
-unxz -c < "$ARCHIVE" | tar -xf -
+unxz -c < "$archive" | tar -xf -
 
 # Touch intl/plural.c to avoid regenerating it from intl/plural.y with
 # recent versions of bison, which is subject to the following known bug.
 # * https://sourceware.org/bugzilla/show_bug.cgi?id=22941
 # * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=92008
-touch "binutils-$VERSION/intl/plural.c"
+touch "binutils-$version/intl/plural.c"
 
 # Apply binutils patchs for Vhex
 
 echo "$TAG Apply Vhex patchs..."
-cp -r "$_src/../../patches/binutils/$VERSION"/* ./binutils-"$VERSION"/
+cp -r "$_src/../../patches/binutils/$version"/* ./binutils-"$version"/
 
 # Create build folder
 
@@ -188,8 +199,9 @@ mkdir build && cd build || exit 1
 
 echo "$TAG Configuring binutils..."
 
-$quiet "../binutils-$VERSION/configure" \
-  --prefix="$SYSROOT"                   \
+utils_callcmd \
+  "../binutils-$version/configure"      \
+  --prefix="$prefix_sysroot"            \
   --target='sh-elf-vhex'                \
   --program-prefix='sh-elf-vhex-'       \
   --with-multilib-list='m3,m4-nofpu'    \
@@ -203,8 +215,6 @@ $quiet "../binutils-$VERSION/configure" \
 
 if [[ "$cache" == 'false' ]]
 then
-  echo "$TAG Removing $ARCHIVE..."
-  rm -f "$ARCHIVE"
+  echo "$TAG Removing $archive..."
+  rm -f "$archive"
 fi
-
-exit 0

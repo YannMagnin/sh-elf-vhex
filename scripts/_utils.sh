@@ -1,4 +1,4 @@
-# module used to provide common variable / functions
+# module used to provide common variables / functions
 # this file must not be manually invoked
 
 #---
@@ -11,49 +11,13 @@ trap 'exit 1' TERM
 export TOP_PID=$$
 
 #---
-# Exposed vars
+# Public
 #---
 
-# select the appropriate quiet primitive
-quiet='utils_run_normaly'
-[[ ! -v 'VHEX_VERBOSE' ]] && quiet='utils_run_quietly vxsdk-build.log'
-export quiet
+export TAG='<sh-elf-vhex>'
 
-# Number of processor cores
-[[ $(uname) == "OpenBSD" ]] && cores=$(sysctl -n hw.ncpu) || cores=$(nproc)
-export cores
-
-# Select make utility
-make_cmd='make'
-[[ $(command -v gmake >/dev/null 2>&1) ]] && make_cmd='gmake'
-export make_cmd
-
-#---
-# Functions provided
-#---
-
-function utils_run_normaly() {
-  echo "$@"
-  if ! "$@"
-  then
-    echo "$TAG error: command failed, abord"
-    kill -s TERM $TOP_PID
-  fi
-}
-
-function utils_run_quietly() {
-  out="$1"
-  shift 1
-  if ! "$@" >"$out" 2>&1
-  then
-    echo "$TAG error: command failed, please check $(pwd)/$out o(x_x)o" >&2
-    echo "$@" >&2
-    kill -s TERM $TOP_PID
-  fi
-  rm -f "$out"
-}
-
-function utils_find_last_version() {
+function utils_find_last_version()
+{
   _version=$(find "$1/" -maxdepth 1 -type d,l)
   _version=$(echo "$_version" | sort -r )
   _version=$(echo "$_version" | head -n 1)
@@ -61,12 +25,33 @@ function utils_find_last_version() {
   echo "$_version"
 }
 
-function utils_get_env() {
-  if [ ! -v "$1" ]
-  then
-    echo 'error: are you sure to use the bootstrap script ?' >&2
-    echo " Missing $2 information, abord" >&2
-    kill -s TERM $TOP_PID
+function utils_callcmd()
+{
+  if [[ -v 'VERBOSE' && "$VERBOSE" == '1' ]]
+    then
+      echo "$@"
+      if ! "$@"; then
+        echo "$TAG error: command failed, abort"
+        kill -s TERM $TOP_PID
+      fi
+  else
+    out='shelfvhex_crash.txt'
+    if ! "$@" >"$out" 2>&1; then
+      echo "$TAG error: command failed, please check $(pwd)/$out o(x_x)o" >&2
+      echo "$@" >&2
+      kill -s TERM $TOP_PID
+    fi
+    rm -f "$out"
   fi
-  echo "${!1/#\~/$HOME}"
+}
+
+function utils_makecmd()
+{
+  [[ $(uname) == "OpenBSD" ]] \
+      && cores=$(sysctl -n hw.ncpu) \
+      || cores=$(nproc)
+  [[ $(command -v gmake >/dev/null 2>&1) ]] \
+      && make_cmd='gmake' \
+      || make_cmd='make'
+  utils_callcmd "$make_cmd" "-j$cores" "$@"
 }

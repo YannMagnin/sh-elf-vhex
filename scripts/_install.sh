@@ -1,9 +1,5 @@
 #! /usr/bin/env bash
 
-verbose=false
-cache=false
-prefix=
-
 #---
 # Help screen
 #---
@@ -25,12 +21,20 @@ EOF
 # Parse arguments
 #---
 
-for arg
-  do case "$arg" in
-    --help | -h)    help;;
-    --cache)        cache=true;;
+cache=false
+verbose=false
+prefix_install=
+prefix_sysroot=
+
+for arg; do
+  case "$arg" in
+    --help | -h)        help;;
+    --verbose | -v)     verbose=true;;
+    --cache)            cache=true;;
+    --prefix-sysroot=*) prefix_sysroot=${arg#*=};;
+    --prefix-install=*) prefix_install=${arg#*=};;
     *)
-      echo "error: unreconized argument '$arg', giving up." >&2
+      echo "error: unrecognized argument '$arg', giving up." >&2
       exit 1
   esac
 done
@@ -43,20 +47,12 @@ _src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd "$_src" || exit 1
 source ./_utils.sh
 
-TAG='<sh-elf-vhex>'
-SYSROOT=$(utils_get_env 'VHEX_PREFIX_SYSROOT' 'sysroot')
-INSTALL=$(utils_get_env 'VHEX_PREFIX_INSTALL' 'install')
-
-# Check that all tools has been generated
-
-if [[ ! -f "$SYSROOT/bin/sh-elf-vhex-gcc" ]]
+if [[ ! -f "$prefix_sysroot/bin/sh-elf-vhex-gcc" ]]
 then
   echo "error: Are you sure to have built sh-elf-vhex ? it seems that" >&2
   echo "  the 'as' tool is missing..." >&2
   exit 1
 fi
-
-# Cleanup build files
 
 if [[ "$cache" == 'false' ]]
 then
@@ -64,13 +60,15 @@ then
   rm -rf ../../build
 fi
 
+[[ "$verbose" == 'true' ]] && export VERBOSE=1
+
 #---
 # Symbolic link executables to $PREFIX
 #---
 
 echo "$TAG Symlinking binaries..."
 
-mkdir -p "$INSTALL"
-for x in "$SYSROOT/bin"/*; do
-  ln -s "$x" "$INSTALL/$x"
+mkdir -p "$prefix_install"
+for x in "$prefix_sysroot/bin"/*; do
+  utils_callcmd ln -sf "$x" "$prefix_install/$(basename "$x")"
 done

@@ -12,7 +12,6 @@ Usage $0 [options...]
 
 Configurations:
   -h, --help            Display this help
-  --verbose             Display extra information during the building step
 EOF
   exit 0
 }
@@ -31,27 +30,21 @@ for arg;
 done
 
 #---
-# Building step
-# @note:
-#   We need to build GCC at least two time. This because we want to enable
-#  shared version of the libgcc. But, to compile this library, we require
-#  building our own standard C library, which require openlibm and the
-#  static version of the libgcc.
-#
-#   To avoid this circular dependency, we shall build the GCC tools with
-#  the static version of the libgcc. This will enable us to compile the
-#  openlibm, then our custom C standard library. After that, we will
-#  rebuild GCC with, this time, the shared version of the libgcc.
+# Preliminary checks
 #---
 
 _src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd "$_src" || exit 1
 source ../_utils.sh
 
-TAG='<sh-elf-vhex-gcc>'
-SYSROOT=$(utils_get_env 'VHEX_PREFIX_SYSROOT' 'sysroot')
+if ! test -d ../../build/gcc || ! test -f ../../build/gcc/sysroot_info.txt
+then
+  echo 'error: Are you sure to have built GCC ? it seems that' >&2
+  echo '  the build directory is missing...' >&2
+  exit 1
+fi
+prefix_sysroot=$(cat ../../build/gcc/sysroot_info.txt)
 
-# Avoid rebuilds and error
 
 if [[ -f ../../build/gcc/.fini ]]
 then
@@ -59,12 +52,6 @@ then
   exit 0
 fi
 
-if [[ ! -d ../../build/gcc ]]
-then
-  echo 'error: Are you sure to have built GCC ? it seems that' >&2
-  echo '  the build directory is missing...' >&2
-  exit 1
-fi
 
 cd ../../build/gcc/build || exit 1
 
@@ -76,8 +63,9 @@ echo "$TAG Configuring GCC (stage 1)..."
 
 # Configure GCC stage-1 (minimal build as possible for library)
 
-$quiet ../gcc/configure                 \
-  --prefix="$SYSROOT"                   \
+utils_callcmd \
+  ../gcc/configure                      \
+  --prefix="$prefix_sysroot"            \
   --target='sh-elf-vhex'                \
   --program-prefix="sh-elf-vhex-"       \
   --with-multilib-list='m3,m4-nofpu'    \
@@ -93,11 +81,11 @@ $quiet ../gcc/configure                 \
 
 echo "$TAG Compiling GCC (usually 10-20 minutes)..."
 
-$quiet $make_cmd -j"$cores" all-gcc
+utils_makecmd all-gcc
 
 echo "$TAG Install GCC..."
 
-$quiet $make_cmd -j"$cores" install-strip-gcc
+utils_makecmd install-strip-gcc
 
 #---
 # Patch the C standar library
@@ -105,17 +93,17 @@ $quiet $make_cmd -j"$cores" install-strip-gcc
 
 # export binaries used to build OpenLibM and fxLibc
 
-export PATH="$PATH:$SYSROOT/bin"
+export PATH="$PATH:$prefix_sysroot/bin"
 
 echo "$TAG Building Vhex's custom C standard library..."
 
-$quiet \
+utils_callcmd \
   git clone https://github.com/YannMagnin/vxLibc.git --depth 1 ../../_vxlibc
 
-../../_vxlibc/scripts/install.sh \
-    --prefix-sysroot="$SYSROOT/sh-elf-vhex/"  \
-    --yes                        \
-    || exit 1
+../../_vxlibc/scripts/install.sh                   \
+  --prefix-sysroot="$prefix_sysroot/sh-elf-vhex/"  \
+  --yes                                            \
+|| exit 1
 
 #---
 # Finish to build GCC
@@ -123,39 +111,38 @@ $quiet \
 
 echo "$TAG Compiling libgcc..."
 
-$quiet $make_cmd -j"$cores" all-target-libgcc
+utils_makecmd all-target-libgcc
 
 echo "$TAG Install libgcc..."
 
-$quiet $make_cmd -j"$cores" install-strip-target-libgcc
+utils_makecmd install-strip-target-libgcc
 
 echo "$TAG Compiling libssp..."
 
-$quiet $make_cmd -j"$cores" all-target-libssp
+utils_makecmd all-target-libssp
 
 echo "$TAG Install libssp..."
 
-$quiet $make_cmd -j"$cores" install-strip-target-libssp
+utils_makecmd install-strip-target-libssp
 
 echo "$TAG Compiling LTO plugin..."
 
-$quiet $make_cmd -j"$cores" all-lto-plugin
+utils_makecmd all-lto-plugin
 
 echo "$TAG Install LTO plugin..."
 
-$quiet $make_cmd -j"$cores" install-strip-lto-plugin
+utils_makecmd install-strip-lto-plugin
 
 echo "$TAG Compiling libsanitizer..."
 
-$quiet $make_cmd -j"$cores" all-target-libsanitizer
+utils_makecmd all-target-libsanitizer
 
 echo "$TAG Install libsanitizer..."
 
-$quiet $make_cmd -j"$cores" install-strip-target-libsanitizer
+utils_makecmd install-strip-target-libsanitizer
 
 #---
 # Indicate that the build is finished
 #---
 
 touch ../.fini
-exit 0
