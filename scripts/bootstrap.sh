@@ -56,14 +56,7 @@ done
 # Preliminary check
 #---
 
-if [[ -d "$prefix_clone" && "$overwrite" != 'true' ]]
-then
-  echo -e \
-    "It seems that the project is already existing :pouce:\n" \
-    'If you realy want to install this project use the "--overwrite"' \
-    "option."
-  exit 1
-fi
+
 
 _src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd "$_src" || exit 1
@@ -105,13 +98,26 @@ fi
 # Perform install operation
 #---
 
-[[ -d "$prefix_clone" ]] && rm -rf "$prefix_clone"
-utils_callcmd \
-  git \
-  clone \
-  --depth=1 \
-  https://github.com/YannMagnin/sh-elf-vhex.git \
-  "$prefix_clone"
+if [[ "$prefix_clone/scripts" != "$_src" ]]
+then
+  if [[ -d "$prefix_clone" && "$overwrite" != 'true' ]]
+  then
+    echo -e \
+      "It seems that the project is already existing :pouce:\n" \
+      'If you realy want to install this project use the "--overwrite"' \
+      'option.'
+    exit 1
+  fi
+  [[ -d "$prefix_clone" ]] && rm -rf "$prefix_clone"
+  utils_callcmd \
+    git \
+    clone \
+    --depth=1 \
+    https://github.com/YannMagnin/sh-elf-vhex.git \
+    "$prefix_clone"
+else
+  echo "WARNING: bootstrap script used in cloned folder, skipped updated" >&2
+fi
 
 cd "$prefix_clone/scripts" || exit 1
 
