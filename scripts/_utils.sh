@@ -18,6 +18,8 @@ export TAG='<sh-elf-vhex>'
 
 function utils_find_last_version()
 {
+  local _version
+
   _version=$(find "$1/" -maxdepth 1 -type d,l)
   _version=$(echo "$_version" | sort -r )
   _version=$(echo "$_version" | head -n 1)
@@ -45,8 +47,32 @@ function utils_callcmd()
   fi
 }
 
+function utils_warn_callcmd()
+{
+  if [[ -v 'VERBOSE' && "$VERBOSE" == '1' ]]
+    then
+      echo "$@"
+      if ! "$@"; then
+        echo "$TAG warning: command failed, skipped"
+        return 1
+      fi
+    return 0
+  else
+    out='shelfvhex_crash.txt'
+    if ! "$@" >"$out" 2>&1; then
+      echo "$TAG warning: command failed, please check $(pwd)/$out" >&2
+      echo "$@" >&2
+      return 1
+    fi
+    rm -f "$out"
+    return 0
+  fi
+}
+
 function utils_makecmd()
 {
+  local cores
+
   [[ $(uname) == "OpenBSD" ]] \
       && cores=$(sysctl -n hw.ncpu) \
       || cores=$(nproc)
@@ -58,10 +84,17 @@ function utils_makecmd()
 
 function utils_archive_download()
 {
+  pushd '.' > /dev/null || exit 1
+  local url
+  local output
+  local cached
+  local src
+
   url=$1
   output=$2
   cached=$3
-  archive="/tmp/sh-elf-vhex/$(basename "$url")"
+  src=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
+  archive="$src/../_cache/$(basename "$url")"
 
   if [[ -d "$output/archive" ]]
   then
@@ -89,13 +122,14 @@ function utils_archive_download()
 
   echo "$TAG Extracting $archive..."
 
-  mkdir -p "$output/archive" && pushd "$output/archive" > /dev/null || exit 1
+  mkdir -p "$output/archive" && cd "$output/archive" || exit 1
   unxz -c < "$archive" | tar --strip-components 1 -xf -
-  popd > /dev/null || exit 1
 
   if [[ "$cached" != 'true' ]]
   then
     echo "$TAG Removing $archive..."
     rm -f "$archive"
   fi
+
+  popd > /dev/null || exit 1
 }

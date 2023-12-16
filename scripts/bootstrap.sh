@@ -16,6 +16,7 @@ Options:
       --prefix-install  Installation (bin) prefix
       --prefix-sysroot  Sysroot (lib, header, ...) prefix
       --prefix-clone    Clone prefix
+      --overwrite       Remove the cloned version if exists and install
       --uninstall       Uninstall operation
 
 Notes:
@@ -34,7 +35,7 @@ action='install'
 verbose='false'
 overwrite='false'
 prefix_install=~/.local/bin
-prefix_sysroot=~/.local/share/sh-elf-vhex/sysroot
+prefix_sysroot=~/.local/share/sh-elf-vhex/_sysroot
 prefix_clone=~/.local/share/sh-elf-vhex
 
 for arg; do
@@ -53,14 +54,41 @@ for arg; do
 done
 
 #---
-# Preliminary check
+# Handle self-clone if needed
 #---
 
-
+# export verbose now to handle the self-clone if needed
+[[ "$verbose" == 'true' ]] && export VERBOSE=1
 
 _src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd "$_src" || exit 1
+
+if [[ "$prefix_clone/scripts" != "$_src" ]]
+then
+  if [[ -d "$prefix_clone" && "$overwrite" != 'true' ]]
+  then
+    echo -e \
+      "It seems that the project is already existing :pouce:\n" \
+      'If you realy want to install this project use the "--overwrite"' \
+      'option.'
+    exit 1
+  fi
+  [[ -d "$prefix_clone" ]] && rm -rf "$prefix_clone"
+  echo '<sh-elf-vhex> self-clone repository...'
+  utils_callcmd \
+    git \
+    clone \
+    --depth=1 \
+    https://github.com/YannMagnin/sh-elf-vhex.git \
+    "$prefix_clone"
+fi
+
+cd "$prefix_clone/scripts" || exit 1
 source ./_utils.sh
+
+#---
+# Preliminary checks
+#---
 
 version_gcc=$(utils_find_last_version ../patches/gcc)
 version_binutils=$(utils_find_last_version ../patches/binutils)
@@ -92,34 +120,10 @@ if [[ "$valid" != 'y' ]]; then
   exit 1
 fi
 
-[[ "$verbose" == 'true' ]] && export VERBOSE=1
 
 #---
-# Perform install operation
+# Performs install/uninstall operation
 #---
-
-if [[ "$prefix_clone/scripts" != "$_src" ]]
-then
-  if [[ -d "$prefix_clone" && "$overwrite" != 'true' ]]
-  then
-    echo -e \
-      "It seems that the project is already existing :pouce:\n" \
-      'If you realy want to install this project use the "--overwrite"' \
-      'option.'
-    exit 1
-  fi
-  [[ -d "$prefix_clone" ]] && rm -rf "$prefix_clone"
-  utils_callcmd \
-    git \
-    clone \
-    --depth=1 \
-    https://github.com/YannMagnin/sh-elf-vhex.git \
-    "$prefix_clone"
-else
-  echo "WARNING: bootstrap script used in cloned folder, skipped updated" >&2
-fi
-
-cd "$prefix_clone/scripts" || exit 1
 
 if [[ "$action" == 'install' ]]
 then
@@ -143,7 +147,11 @@ then
   echo "Do not forget to export the binary path '$prefix_install'"
 else
   {
-    ./scripts/_uninstall.sh
+    ./_uninstall.sh                         \
+        --prefix-sysroot="$prefix_sysroot"  \
+        --prefix-install="$prefix_install"  \
+        --prefix-clone="$prefix_clone"      \
+        --purge
   } || {
     echo 'Error during unstallation step, abort' >&2
     exit 1

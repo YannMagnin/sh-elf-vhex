@@ -111,4 +111,12 @@ mkdir ./build
 echo "$TAG install dependencies..."
 
 cd ./archive || exit 1
-utils_callcmd ./contrib/download_prerequisites
+if ! utils_warn_callcmd ./contrib/download_prerequisites
+then
+  echo "The installation of GCC's prerequisites have failed"
+  read -p 'Do you want to continue the installation ? [yN]: ' -r valid
+  if [[ "$valid" != 'y' ]]; then
+    echo 'Operation aborted o(x_x)o'
+    exit 1
+  fi
+fi

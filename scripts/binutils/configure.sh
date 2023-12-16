@@ -86,28 +86,28 @@ fi
 if command -v pkg >/dev/null 2>&1
 then
   deps='cmake libmpfr libmpc libgmp libpng flex clang git texinfo'
-  deps="$deps libisl bison xz-utils"
+  deps="$deps libisl bison xz-utils gcc"
   pm='pkg'
   pm_has='dpkg -s'
   pm_install='ASSUME_ALWAYS_YES=yes pkg install'
 elif command -v apt >/dev/null 2>&1
 then
   deps='cmake libmpfr-dev libmpc-dev libgmp-dev libpng-dev libppl-dev'
-  deps="$deps flex g++ git texinfo xz-utils"
+  deps="$deps flex g++ git texinfo xz-utils gcc"
   pm='apt'
   pm_has='dpkg -s'
   pm_install='sudo apt install -y'
 elif command -v dnf >/dev/null 2>&1
 then
   deps='cmake mpfr-devel libmpc-devel gmp-devel libpng-devel ppl-devel'
-  deps="$deps flex gcc git texinfo xz"
+  deps="$deps flex gcc git texinfo xz gcc-c++"
   pm='dnf'
-  pm_has="echo '$(rpm -qa)' | grep -i"
+  pm_has='dnf list installed | grep -i'
   pm_install='sudo dnf install -y'
-  fix='-'
+  fix='^'
 elif command -v pacman >/dev/null 2>&1
 then
-  deps='cmake mpfr libmpc gmp libpng ppl flex gcc git texinfo xz'
+  deps='cmake mpfr libmpc gmp libpng ppl flex gcc git texinfo xz gcc'
   pm='pacman'
   pm_has='pacman -Qi'
   pm_install='sudo pacman -S --noconfirm'
@@ -118,7 +118,7 @@ fi
 missing=''
 if [[ -z "$trust_deps" ]]; then
   for d in $deps; do
-    if ! bash -c "$pm_has $d$fix" >/dev/null 2>&1; then
+    if ! bash -c "$pm_has $fix$d" >/dev/null 2>&1; then
       missing="$missing $d"
     fi
   done
