@@ -8,9 +8,9 @@ SuperH architecture
 https://gcc.gnu.org/legacy-ml/gcc-help/current/000075.html
 ):
 
-The generation of dynamic libraries is blocked by GCC (the `--shared` flag is ignored),
-because the `sh3eb-elf` target (the one used for cross-compiling on Casio calculators),
-does not support this functionality.
+The generation of dynamic libraries is blocked by GCC (the `--shared` flag is
+ignored), because the `sh3eb-elf` target (the one used for cross-compiling on
+Casio calculators), does not support this functionality.
 
 I am currently building a kernel for Casio's calculator for a graduation
 project and I need this functionality. I had discovered, thanks to
@@ -30,17 +30,31 @@ This repository gathers only the files that we had to modify for
 `binutils` and` GCC`, as well as scripts to automate the installation of this
 particular GCC.
 
+## Features/Limitations
+
+* only C is supported
+* only big endian encoding is supported
+* we use the stdint header from `newlib`. Otherwise, the generation of `stdint.h` is incomplete
+* we only target the `SH4A-NOFPU` processor (no backward compatibility with the SH3 assembler)
+* each public symbol begins with an underscore
+* by default, we link our own C library to each generation of an object file
+* we do not provide a specialized default linker script (for the moment)
+* compilation of the shared libgcc (`t-slibgcc`)
+* the compilation of the libgcc in PIC (`t-libgcc-pic`)
+* compilation of the library for emulated floating point numbers (`t-fdpbit`)
+
 ## Technical notes
 
-As for the details of the `sh-elf-vhex` target that we created:
+The bootstrap process will clone this repository at
+`~/.local/share/sh-elf-vhex` then will start the installation using:
 
-  * only C is supported
-  * only big endian encoding is supported
-  * we use the stdint header from `newlib`. Otherwise, the generation of `stdint.h` is incomplete
-  * we only target the SH4A-NOFPU processor (no backward compatibility with the SH3 assembler)
-  * each public symbol begins with an underscore
-  * by default, we link our own C library to each generation of an object file
-  * we do not provide a specialized default linker script (for the moment)
+* `prefix-clone` = `~/.local/share/sh-elf-vhex`
+* `prefix-sysroot` = `~/.local/share/sh-elf-vhex/_sysroot`
+* `prefix-install` = `~/.local/bin/`
+
+The project also automatically install
+[vxOpenLibm](https://github.com/YannMagnin/vxOpenLibm)
+and [vxLibc](https://github.com/YannMagnin/vxLibc)
 
 ## Installing
 
