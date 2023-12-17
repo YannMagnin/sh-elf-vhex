@@ -114,7 +114,7 @@ then
 else
     read -p 'Uninstall the sh-elf-vhex compiler ? [yN]: ' -r valid
 fi
-if [[ "$valid" != 'y' ]]; then
+if [[ -t 0 && "$valid" != 'y' ]]; then
   echo 'Operation aborted o(x_x)o'
   exit 1
 fi
