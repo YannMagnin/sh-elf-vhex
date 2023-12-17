@@ -6,7 +6,7 @@
 
 function help() {
   cat << EOF
-Script for the installation step of binutils/GCC tools for the Vhex kernel.
+Script for the installation step of binutils/GCC tools for the Vhex project.
 
 Usage $0 [options...]
 

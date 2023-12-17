@@ -60,8 +60,9 @@ and [vxLibc](https://github.com/YannMagnin/vxLibc)
 
 The build is relatively simple and can be done in two different ways:
 
+Using `curl` and `jq`:
 ```bash
-curl -s "https://github.com/YannMagnin/sh-elf-vhex/+/HEAD/scripts/bootstrap.sh?format=TEXT" | base64 --decode | bash
+curl 'https://api.github.com/repos/YannMagnin/sh-elf-vhex/contents/scripts/bootstrap.sh' | jq -r '.content' | base64 --decode | bash
 ```
 
 Or by cloning the project and using the `bootstrap.sh` script, see

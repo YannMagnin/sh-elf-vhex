@@ -6,7 +6,7 @@
 
 function help() {
   cat << EOF
-Script for the configuration step of Vhex kernel's binutils.
+Script for the configuration step of Vhex's binutils.
 
 Usage $0 [options...]
 

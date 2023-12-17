@@ -75,8 +75,7 @@ then
   fi
   [[ -d "$prefix_clone" ]] && rm -rf "$prefix_clone"
   echo '<sh-elf-vhex> self-clone repository...'
-  utils_callcmd \
-    git \
+  git \
     clone \
     --depth=1 \
     https://github.com/YannMagnin/sh-elf-vhex.git \
