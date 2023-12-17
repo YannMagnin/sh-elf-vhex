@@ -17,10 +17,10 @@ project and I need this functionality. I had discovered, thanks to
 [Lephenixnoir](https://silent-tower.net/research/),
 that we could generate 'shared' libraries by using directly `ld` with a custom
 linker script, but this workaround was of short duration. Indeed, we are
-dependent on a library called `libgcc`, which provide some useful critical
-primitives and which is generated only statically (therefore with
-non-relocatable code), which broke all shared object file generated with this
-dependencie (and a lot of cases can involve this librarie).
+dependent on a library called `libgcc`, which provides some useful critical
+primitives and is generated only in static (therefore with
+non-relocatable code) which breaks all shared object files generated with this
+dependency (and a lot of cases can involve this library).
 
 With the help of Lephenixnoir, we tried to add a target for the
 superH architecture called `sh-elf-vhex`, allowing us to enable these features
@@ -34,13 +34,13 @@ particular GCC.
 
 * only C is supported
 * only big endian encoding is supported
-* we use the stdint header from `newlib`. Otherwise, the generation of `stdint.h` is incomplete
+* we use the `stdint` header from `newlib`. Otherwise, the generation of `stdint.h` is incomplete
 * we only target the `SH4A-NOFPU` processor (no backward compatibility with the SH3 assembler)
 * each public symbol begins with an underscore
-* by default, we link our own C library to each generation of an object file
+* by default, we link our own C library to each generation of object files
 * we do not provide a specialized default linker script (for the moment)
 * compilation of the shared libgcc (`t-slibgcc`)
-* the compilation of the libgcc in PIC (`t-libgcc-pic`)
+* compilation of the libgcc in PIC (`t-libgcc-pic`)
 * compilation of the library for emulated floating point numbers (`t-fdpbit`)
 
 ## Technical notes
@@ -52,7 +52,7 @@ The bootstrap process will clone this repository at
 * `prefix-sysroot` = `~/.local/share/sh-elf-vhex/_sysroot`
 * `prefix-install` = `~/.local/bin/`
 
-The project also automatically install
+The project also automatically installs
 [vxOpenLibm](https://github.com/YannMagnin/vxOpenLibm)
 and [vxLibc](https://github.com/YannMagnin/vxLibc)
 
@@ -65,7 +65,7 @@ curl -s "https://github.com/YannMagnin/sh-elf-vhex/+/HEAD/scripts/bootstrap.sh?f
 ```
 
 Or by cloning the project and using the `bootstrap.sh` script, see
-`./scripts/bootstrap.sh --help` for more information about possible operation
+`./scripts/bootstrap.sh --help` for more information about possible operations
 you can do with it (like uninstalling the compiler)
 
 ```bash
@@ -79,10 +79,11 @@ It takes about twenty minutes for the build.
 
 ## Supported version list
 
-Note that GCC `12.x` will never be supported since many critical bugs has been
+Note that GCC `12.x` will never be supported since many critical bugs have been
 found for the superh backend
 (https://gcc.gnu.org/bugzilla/show\_bug.cgi?id=106609)
 
+- GCC `13.2.0` and binutils `2.41`
 - GCC `11.2.0` and binutils `2.31`
 
 ## Special thanks

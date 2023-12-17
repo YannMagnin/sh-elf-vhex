@@ -58,7 +58,7 @@ echo "$TAG Target gcc version -> $version"
 echo "$TAG Sysroot found -> $prefix_sysroot"
 
 #---
-# Avoid rebuilds of the same version
+# Avoid rebuilding of the same version
 #---
 
 gcc_bin="$prefix_sysroot/bin/sh-elf-vhex-gcc"
@@ -68,7 +68,7 @@ then
   gcc_version=$($gcc_bin --version | head -n 1 | grep -Eo '[0-9.]+$')
   if [[ "$gcc_version" == "$version" ]]
   then
-    echo "$TAG Version $version already installed, skipping rebuild"
+    echo "$TAG Version $version already installed, skipping rebuilding"
     mkdir -p ../../_build/gcc/
     touch ../../_build/gcc/.fini
     exit 0
@@ -92,7 +92,7 @@ utils_archive_download \
 
 cd ../../_build/gcc || exit 1
 
-echo "$TAG Apply Vhex patchs..."
+echo "$TAG Apply Vhex patches..."
 cp -r "../../patches/gcc/$version"/* ./archive/
 
 # Store the sysroot prefix to avoid different CLI between binutils and gcc
@@ -113,7 +113,7 @@ echo "$TAG install dependencies..."
 cd ./archive || exit 1
 if ! utils_warn_callcmd ./contrib/download_prerequisites
 then
-  echo "The installation of GCC's prerequisites have failed"
+  echo "The installation of GCC's prerequisites has failed"
   read -p 'Do you want to continue the installation ? [yN]: ' -r valid
   if [[ "$valid" != 'y' ]]; then
     echo 'Operation aborted o(x_x)o'

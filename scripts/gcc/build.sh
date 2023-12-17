@@ -24,7 +24,7 @@ for arg;
   do case "$arg" in
     --help | -h) help;;
     *)
-      echo "error: unreconized argument '$arg', giving up." >&2
+      echo "error: unrecognized argument '$arg', giving up." >&2
       exit 1
   esac
 done
@@ -48,7 +48,7 @@ prefix_sysroot=$(cat ../../_build/gcc/sysroot_info.txt)
 
 if [[ -f ../../_build/gcc/.fini ]]
 then
-  echo "$TAG already build, skipping rebuild"
+  echo "$TAG already built, skipping rebuilding"
   exit 0
 fi
 
@@ -142,7 +142,7 @@ echo "$TAG Install libsanitizer..."
 utils_makecmd install-strip-target-libsanitizer
 
 #---
-# Indicate that the build is finished
+# Indicate that the building up is finished
 #---
 
 touch ../.fini

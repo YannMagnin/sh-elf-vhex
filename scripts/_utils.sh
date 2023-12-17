@@ -98,7 +98,7 @@ function utils_archive_download()
 
   if [[ -d "$output/archive" ]]
   then
-    echo "$TAG Found archive, skipping download"
+    echo "$TAG Archive found, skipping download"
     exit 0
   fi
 

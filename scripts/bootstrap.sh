@@ -21,8 +21,8 @@ Options:
 
 Notes:
     This project will automatically install the vxLibc. You can use the
-  VERBOSE env var to enable the verbose mode without explicit the '--verbose'
-  option.
+  VERBOSE env var to enable the verbose mode without explicit use of the
+  '--verbose' option.
 EOF
   exit 0
 }
@@ -69,7 +69,7 @@ then
   then
     echo -e \
       "It seems that the project is already existing :pouce:\n" \
-      'If you realy want to install this project use the "--overwrite"' \
+      'If you really want to install this project use the "--overwrite"' \
       'option.'
     exit 1
   fi
@@ -153,7 +153,7 @@ else
         --prefix-clone="$prefix_clone"      \
         --purge
   } || {
-    echo 'Error during unstallation step, abort' >&2
+    echo 'Error during uninstallation step, abort' >&2
     exit 1
   }
   echo 'Successfully uninstalled sh-elf-vhex'

@@ -24,7 +24,7 @@ for arg;
   do case "$arg" in
     --help | -h)    help;;
     *)
-      echo "error: unreconized argument '$arg', giving up." >&2
+      echo "error: unrecognized argument '$arg', giving up." >&2
       exit 1
   esac
 done
@@ -41,7 +41,7 @@ source ../_utils.sh
 
 if [[ -f ../../_build/binutils/.fini  ]]
 then
-  echo "$TAG already build, skipping rebuild"
+  echo "$TAG already built, skipping rebuild"
   exit 0
 fi
 
@@ -66,6 +66,6 @@ echo "$TAG Installing binutils to sysroot..."
 
 utils_makecmd install-strip
 
-# Indicate that the build is finished
+# Indicate that the construction is finished
 
 touch ../.fini

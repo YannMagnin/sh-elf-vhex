@@ -70,7 +70,7 @@ then
   as_version=$($as_bin --version | head -n 1 | grep -Eo '[0-9.]+$')
   if [[ "$as_version" == "$version" ]]
   then
-    echo "$TAG Version '$version' already installed, skipping rebuild" >&2
+    echo "$TAG Version '$version' already installed, skipping rebuilding" >&2
     mkdir -p ../../_build/binutils/
     touch ../../_build/binutils/.fini
     exit 0
@@ -160,9 +160,9 @@ cd ../../_build/binutils || exit 1
 # * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=92008
 touch ./archive/intl/plural.c
 
-# Apply binutils patchs for Vhex
+# Apply binutils patches for Vhex
 
-echo "$TAG Apply Vhex patchs..."
+echo "$TAG Apply Vhex patches..."
 cp -r "$_src/../../patches/binutils/$version"/* ./archive/
 
 # Create build folder

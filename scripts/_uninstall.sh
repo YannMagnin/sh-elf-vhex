@@ -16,7 +16,7 @@ Configurations:
       --prefix-install  Installation (bin) prefix
       --prefix-sysroot  Sysroot (lib, header, ...) prefix
       --prefix-clone    Clone prefix
-      --purge           Remove the clonned folder
+      --purge           Remove the cloned folder
 EOF
   exit 0
 }
@@ -37,7 +37,7 @@ for arg
     --prefix-sysroot=*) prefix_sysroot=${arg#*=};;
     --prefix-clone=*)   prefix_clone=${arg#*=};;
     *)
-      echo "error: unreconized argument '$arg', giving up." >&2
+      echo "error: unrecognized argument '$arg', giving up." >&2
       exit 1
   esac
 done
@@ -48,14 +48,14 @@ done
 
 if [[ -z "$prefix_install" || -z "$prefix_sysroot" || -z "$prefix_clone" ]]
 then
-  echo 'Missing prefix information, abord' >&2
+  echo 'Missing prefix information, abort' >&2
   exit 1
 fi
 
 if [[ ! -f "$prefix_sysroot/bin/sh-elf-vhex-as" ]]
 then
-  echo 'error: Are you sure to have built sh-elf-vhex ? it seems that' >&2
-  echo '  Missing '\''sh-elf-vhex-as'\'' tool...' >&2
+  echo 'error: Are you sure to have built sh-elf-vhex ?' >&2
+  echo '  Missing '\''sh-elf-vhex-as'\'' tool' >&2
   exit 1
 fi
 

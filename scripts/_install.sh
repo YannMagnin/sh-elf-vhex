@@ -50,13 +50,13 @@ source ./_utils.sh
 if [[ ! -f "$prefix_sysroot/bin/sh-elf-vhex-gcc" ]]
 then
   echo "error: Are you sure to have built sh-elf-vhex ? it seems that" >&2
-  echo "  the 'as' tool is missing..." >&2
+  echo "  the 'sh-elf-vhex-gcc' tool is missing..." >&2
   exit 1
 fi
 
 if [[ "$cache" == 'false' ]]
 then
-  echo "$TAG Cleaning up build files..."
+  echo "$TAG Cleaning up built files..."
   rm -rf ../../build
 fi
 
