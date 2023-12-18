@@ -130,7 +130,7 @@ then
     "$TAG Based on $pm, some dependencies are missing: $missing\n" \
     "$TAG Do you want to run '$pm_install $missing' to install "   \
     'them [nY]? '
-  read -r do_install
+  read -r do_install < /dev/tty
   if [[ "$do_install" != 'n' ]]
   then
     bash -c "$pm_install $missing"

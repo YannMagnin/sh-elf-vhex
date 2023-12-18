@@ -110,9 +110,9 @@ then
   echo " - Binutils version:      $version_binutils"
   echo " - Clone directory:       $prefix_clone"
   echo " - Compliler install at:  $prefix_install"
-  read -p 'Process ? [yN]: ' -r valid
+  read -p 'Process ? [yN]: ' -r valid < /dev/tty
 else
-    read -p 'Uninstall the sh-elf-vhex compiler ? [yN]: ' -r valid
+    read -p 'Uninstall the sh-elf-vhex compiler ? [yN]: ' -r valid < dev/tty
 fi
 
 # check if the stdin exists, which is not the case when the script is piped

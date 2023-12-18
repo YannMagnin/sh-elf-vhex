@@ -113,8 +113,10 @@ echo "$TAG install dependencies..."
 cd ./archive || exit 1
 if ! utils_warn_callcmd ./contrib/download_prerequisites
 then
-  echo "The installation of GCC's prerequisites has failed"
-  read -p 'Do you want to continue the installation ? [yN]: ' -r valid
+  echo -en \
+    'The installation of GCC'\''s prerequisites has failed\n' \
+    'Do you want to continue the installation ? [yN]: '
+  read -r valid < /dev/tty
   if [[ "$valid" != 'y' ]]; then
     echo 'Operation aborted o(x_x)o'
     exit 1
