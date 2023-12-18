@@ -112,7 +112,7 @@ then
   echo " - Compliler install at:  $prefix_install"
   read -p 'Process ? [yN]: ' -r valid < /dev/tty
 else
-    read -p 'Uninstall the sh-elf-vhex compiler ? [yN]: ' -r valid < dev/tty
+    read -p 'Uninstall the sh-elf-vhex compiler ? [yN]: ' -r valid < /dev/tty
 fi
 
 # check if the stdin exists, which is not the case when the script is piped
