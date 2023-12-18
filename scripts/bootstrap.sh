@@ -69,7 +69,7 @@ then
   then
     echo -e \
       "It seems that the project is already existing :pouce:\n" \
-      'If you really want to install this project use the "--overwrite"' \
+      'If you really want to reinstall this project use the "--overwrite"' \
       'option.'
     exit 1
   fi
@@ -114,11 +114,16 @@ then
 else
     read -p 'Uninstall the sh-elf-vhex compiler ? [yN]: ' -r valid
 fi
-if [[ -t 0 && "$valid" != 'y' ]]; then
+
+# check if the stdin exists, which is not the case when the script is piped
+# with bash (cat ./script/bootstrap.sh | bash)
+if [[ -t 0 ]]
+then
+  if [[ "$valid" != 'y' ]]; then
   echo 'Operation aborted o(x_x)o'
   exit 1
+  fi
 fi
-
 
 #---
 # Performs install/uninstall operation
