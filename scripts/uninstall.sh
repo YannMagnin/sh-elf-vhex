@@ -60,7 +60,7 @@ if [[ ! -d "$prefix_install" ]]
 then
   echo -e \
     'WARNING: seems that the install prefix does not exists\n' \
-    'WARNING: if you continue, the install prefix will be ignored and' \
+    'WARNING: if you continue, the install prefix will be ignore and' \
     'nothing will be removed' \
   >&2
   read -p 'Proccess anyway ? [yN]' -r valid < /dev/tty

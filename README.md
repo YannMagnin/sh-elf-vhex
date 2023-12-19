@@ -43,6 +43,42 @@ particular GCC.
 * compilation of the libgcc in PIC (`t-libgcc-pic`)
 * compilation of the library for emulated floating point numbers (`t-fdpbit`)
 
+## Installing
+
+The build is relatively simple and can be done in two different ways:
+
+Using `curl`:
+```bash
+curl -fsSL https://raw.githubusercontent.com/YannMagnin/sh-elf-vhex/HEAD/scripts/install.sh | bash
+```
+
+Note that you can do the uninstallation using `curl` too:
+```bash
+curl -fsSL https://raw.githubusercontent.com/YannMagnin/sh-elf-vhex/HEAD/scripts/uninstall.sh | bash
+```
+
+Or by cloning the project and using the `install.sh` script, see
+`./scripts/install.sh --help` for more information about possible operations
+you can do with it
+
+```bash
+cd /tmp/
+git clone 'https://github.com/YannMagnin/sh-elf-vhex.git' --depth=1
+cd /tmp/sh-elf-vhex || exit 1
+./script/install.sh
+```
+
+It takes about twenty minutes for the build.
+
+## Supported version list
+
+Note that GCC `12.x` will never be supported since many critical bugs have been
+found for the superh backend
+(https://gcc.gnu.org/bugzilla/show\_bug.cgi?id=106609)
+
+- GCC `13.2.0` and binutils `2.41`
+- GCC `11.2.0` and binutils `2.31`
+
 ## Technical notes
 
 The bootstrap process will clone this repository at
@@ -56,36 +92,7 @@ The project also automatically installs
 [vxOpenLibm](https://github.com/YannMagnin/vxOpenLibm)
 and [vxLibc](https://github.com/YannMagnin/vxLibc)
 
-## Installing
 
-The build is relatively simple and can be done in two different ways:
-
-Using `curl` and `jq`:
-```bash
-curl -fsSL https://raw.githubusercontent.com/YannMagnin/sh-elf-vhex/HEAD/scripts/bootstrap.sh | bash
-```
-
-Or by cloning the project and using the `bootstrap.sh` script, see
-`./scripts/bootstrap.sh --help` for more information about possible operations
-you can do with it (like uninstalling the compiler)
-
-```bash
-cd /tmp/
-git clone 'https://github.com/YannMagnin/sh-elf-vhex.git' --depth=1
-cd /tmp/sh-elf-vhex || exit 1
-./script/bootstrap.sh
-```
-
-It takes about twenty minutes for the build.
-
-## Supported version list
-
-Note that GCC `12.x` will never be supported since many critical bugs have been
-found for the superh backend
-(https://gcc.gnu.org/bugzilla/show\_bug.cgi?id=106609)
-
-- GCC `13.2.0` and binutils `2.41`
-- GCC `11.2.0` and binutils `2.31`
 
 ## Special thanks
 
