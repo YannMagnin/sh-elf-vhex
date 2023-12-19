@@ -13,7 +13,6 @@ Usage $0 [options...]
 
 Configurations:
   -h, --help            Display this help
-  -v, --verbose         Display extra information during operation
       --prefix-install  Installation (bin) prefix
       --prefix-sysroot  Sysroot (lib, header, ...) prefix
       --prefix-clone    Clone prefix
@@ -76,6 +75,17 @@ then
     'ERROR: Are you sure to have built sh-elf-vhex ? Seems that the' \
     'sh-elf-vhex-as cannot be found in the sysroot prefix' \
   >&2
+  exit 1
+fi
+
+echo 'The script will uninstall the sh-elf-vhex compiler with:'
+echo " - Clone directory:   $prefix_clone"
+echo " - Install directory: $prefix_install"
+echo " - Sysroot directory: $prefix_sysroot"
+read -p 'Process ? [yN]: ' -r valid < /dev/tty
+if [[ "$valid" != 'y' ]]
+then
+  echo 'Operation aborted o(x_x)o'
   exit 1
 fi
 
