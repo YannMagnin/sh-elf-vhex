@@ -62,7 +62,7 @@ The build is relatively simple and can be done in two different ways:
 
 Using `curl` and `jq`:
 ```bash
-curl 'https://api.github.com/repos/YannMagnin/sh-elf-vhex/contents/scripts/bootstrap.sh' | jq -r '.content' | base64 --decode | bash
+curl -fsSL https://raw.githubusercontent.com/YannMagnin/sh-elf-vhex/HEAD/scripts/bootstrap.sh | bash
 ```
 
 Or by cloning the project and using the `bootstrap.sh` script, see

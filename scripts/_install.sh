@@ -47,7 +47,7 @@ _src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd "$_src" || exit 1
 source ./_utils.sh
 
-if [[ ! -f "$prefix_sysroot/bin/sh-elf-vhex-gcc" ]]
+if [[ ! -x "$prefix_sysroot/bin/sh-elf-vhex-gcc" ]]
 then
   echo "error: Are you sure to have built sh-elf-vhex ? it seems that" >&2
   echo "  the 'sh-elf-vhex-gcc' tool is missing..." >&2

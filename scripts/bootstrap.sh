@@ -63,23 +63,38 @@ done
 _src=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd "$_src" || exit 1
 
+has_been_cloned='false'
 if [[ "$prefix_clone/scripts" != "$_src" ]]
 then
-  if [[ -d "$prefix_clone" && "$overwrite" != 'true' ]]
+  if [[ "$action" != 'install' ]]; then
+    echo \
+      'No need to uninstall the sh-elf-vhex since no cloned repository' \
+      'has been found, ignored'
+    exit 0
+  fi
+  if [ -x "$prefix_sysroot/bin/sh-elf-vhex-gcc" ]
   then
     echo -e \
-      "It seems that the project is already existing :pouce:\n" \
+      'It seems that the project is already installed :pouce:\n' \
       'If you really want to reinstall this project use the "--overwrite"' \
       'option.'
     exit 1
   fi
-  [[ -d "$prefix_clone" ]] && rm -rf "$prefix_clone"
-  echo '<sh-elf-vhex> self-clone repository...'
-  git \
-    clone \
-    --depth=1 \
-    https://github.com/YannMagnin/sh-elf-vhex.git \
-    "$prefix_clone"
+  if [[ ! -d "$prefix_clone" || "$overwrite" == 'true' ]]
+  then
+    [[ -d "$prefix_clone" ]] && rm -rf "$prefix_clone"
+    echo '<sh-elf-vhex> self-clone repository...'
+    {
+      git \
+        clone \
+        --depth=1 \
+        https://github.com/YannMagnin/sh-elf-vhex.git \
+        "$prefix_clone"
+    } || {
+      exit 1
+    }
+    has_been_cloned='true'
+  fi
 fi
 
 cd "$prefix_clone/scripts" || exit 1
@@ -110,19 +125,21 @@ then
   echo " - Binutils version:      $version_binutils"
   echo " - Clone directory:       $prefix_clone"
   echo " - Compliler install at:  $prefix_install"
+  if [[ "$has_been_cloned" == 'true' ]]; then
+    echo 'Note that the cloned repository will be removed if aborted'
+  fi
   read -p 'Process ? [yN]: ' -r valid < /dev/tty
 else
     read -p 'Uninstall the sh-elf-vhex compiler ? [yN]: ' -r valid < /dev/tty
 fi
 
-# check if the stdin exists, which is not the case when the script is piped
-# with bash (cat ./script/bootstrap.sh | bash)
-if [[ -t 0 ]]
-then
-  if [[ "$valid" != 'y' ]]; then
+if [[ "$valid" != 'y' ]]; then
+  if [[ "$has_been_cloned" == 'true' ]]; then
+    echo 'Removing the cloned repository...'
+    rm -rf "$prefix_clone"
+  fi
   echo 'Operation aborted o(x_x)o'
   exit 1
-  fi
 fi
 
 #---

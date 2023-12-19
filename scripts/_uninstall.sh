@@ -52,7 +52,7 @@ then
   exit 1
 fi
 
-if [[ ! -f "$prefix_sysroot/bin/sh-elf-vhex-as" ]]
+if [[ ! -x "$prefix_sysroot/bin/sh-elf-vhex-as" ]]
 then
   echo 'error: Are you sure to have built sh-elf-vhex ?' >&2
   echo '  Missing '\''sh-elf-vhex-as'\'' tool' >&2
