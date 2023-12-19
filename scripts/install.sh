@@ -131,10 +131,7 @@ fi
   && ./gcc/configure.sh       \
       --prefix-sysroot="$prefix_sysroot"    \
       --version="$version_gcc"              \
-  && ./gcc/build.sh           \
-  && ./_install.sh            \
-      --prefix-sysroot="$prefix_sysroot"    \
-      --prefix-install="$prefix_install"
+  && ./gcc/build.sh
 } || {
     echo 'Error during installing operations' >&2
     exit 1

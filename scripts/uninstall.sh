@@ -83,8 +83,7 @@ fi
 # Unistall step
 #---
 
-_src=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
-cd "$_src" || exit 1
+cd "$prefix_clone/scripts" || exit 1
 source ./_utils.sh
 
 echo "$TAG removing symlinks to binaries..."
