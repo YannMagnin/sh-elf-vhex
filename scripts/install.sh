@@ -158,7 +158,7 @@ then
   rm -rf ../../build
 fi
 
-echo -en \
+echo -e \
   'Successfully installed sh-elf-vhex !\n' \
   '\rDo not forget to export the binary path' \
   "'export PATH=\"\$PATH:$prefix_install\"'"

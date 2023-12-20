@@ -81,7 +81,7 @@ echo "$TAG Compiling GCC (usually 10-20 minutes)..."
 
 utils_makecmd all-gcc
 
-echo "$TAG Install GCC..."
+echo "$TAG Install partial GCC..."
 
 utils_makecmd install-strip-gcc
 

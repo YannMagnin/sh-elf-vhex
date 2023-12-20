@@ -102,6 +102,15 @@ function utils_archive_download()
     exit 0
   fi
 
+  if test -f "$archive"
+  then
+    if ! tar -tf "$archive" &> /dev/null
+    then
+      echo "WARNING: Unable to validate the archive, force re-download" >&2
+      rm -f "$archive"
+    fi
+  fi
+
   if ! test -f "$archive"
   then
     echo "$TAG Downloading $url..."
