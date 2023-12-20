@@ -63,7 +63,7 @@ cd "$_src" || exit 1
 has_been_cloned='false'
 if [[ "$prefix_clone/scripts" != "$_src" ]]
 then
-  if [ -x "$prefix_sysroot/bin/sh-elf-vhex-gcc" ]
+  if [ -x "$prefix_install/sh-elf-vhex-gcc" ]
   then
     echo -e \
       'It seems that the project is already installed :pouce:\n' \
