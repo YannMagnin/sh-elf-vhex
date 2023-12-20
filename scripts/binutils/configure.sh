@@ -83,7 +83,14 @@ fi
 # Check dependencies for binutils and GCC and offer to install them
 #---
 
-if command -v pkg >/dev/null 2>&1
+if [[ "$(uname -s)" == 'Darwin' ]]
+then
+  deps='cmake mpfr libmpc gmp libpng ppl flex gcc git texinfo xz gcc'
+  pm='brew'
+  pm_has='brew list | grep -i'
+  pm_install='brew install'
+  fix='^'
+elif command -v pkg >/dev/null 2>&1
 then
   deps='cmake libmpfr libmpc libgmp libpng flex clang git texinfo'
   deps="$deps libisl bison xz-utils gcc"

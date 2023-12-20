@@ -74,7 +74,7 @@ It takes about twenty minutes for the build.
 
 Note that GCC `12.x` will never be supported since many critical bugs have been
 found for the superh backend
-(https://gcc.gnu.org/bugzilla/show\_bug.cgi?id=106609)
+(https://gcc.gnu.org/bugzilla/show_bug.cgi?id=106609)
 
 - GCC `13.2.0` and binutils `2.41`
 - GCC `11.2.0` and binutils `2.31`
