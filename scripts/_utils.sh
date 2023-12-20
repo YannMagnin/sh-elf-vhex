@@ -29,7 +29,7 @@ function utils_find_last_version()
 
 function utils_callcmd()
 {
-  if [[ -v 'VERBOSE' && "$VERBOSE" == '1' ]]
+  if [[ "$VERBOSE" == '1' ]]
     then
       echo "$@"
       if ! "$@"; then
@@ -49,7 +49,7 @@ function utils_callcmd()
 
 function utils_warn_callcmd()
 {
-  if [[ -v 'VERBOSE' && "$VERBOSE" == '1' ]]
+  if [[ "$VERBOSE" == '1' ]]
     then
       echo "$@"
       if ! "$@"; then
@@ -73,7 +73,7 @@ function utils_makecmd()
 {
   local cores
 
-  [[ $(uname) == "OpenBSD" ]] \
+  [[ "$(uname -s)" == 'OpenBSD' || "$(uname -s)" == 'Darwin' ]] \
       && cores=$(sysctl -n hw.ncpu) \
       || cores=$(nproc)
   [[ $(command -v gmake >/dev/null 2>&1) ]] \
