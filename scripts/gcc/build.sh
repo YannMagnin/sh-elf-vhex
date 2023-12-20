@@ -59,9 +59,7 @@ cd ../../_build/gcc/build || exit 1
 # Build GCC stage-1
 #---
 
-echo "$TAG Configuring GCC (stage 1)..."
-
-# Configure GCC stage-1 (minimal build as possible for library)
+echo "$TAG Configuring GCC..."
 
 utils_callcmd \
   ../archive/configure                  \
