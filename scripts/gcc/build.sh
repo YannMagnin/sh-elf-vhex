@@ -143,6 +143,8 @@ utils_makecmd install-strip-target-libsanitizer
 # Indicate that the building up is finished
 #---
 
+echo "$TAG Cleaning up..."
+
 rm -rf ../build
 rm -rf ../archive
 touch ../.fini

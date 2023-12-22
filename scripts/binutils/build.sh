@@ -68,6 +68,8 @@ utils_makecmd install-strip
 
 # Indicate that the construction is finished
 
+echo "$TAG Cleaning up..."
+
 rm -rf ../build
 rm -rf ../archive
 touch ../.fini
