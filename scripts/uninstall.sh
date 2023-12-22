@@ -50,7 +50,7 @@ if [[ ! -d "$prefix_clone" ]]
 then
   echo -e \
     'Are you sure to have installed the project ?\n' \
-    '\rIt seems that the cloned prefix does not exists' \
+    '\rIt seems that the cloned prefix does not exist' \
   >&2
   exit 1
 fi
@@ -58,11 +58,11 @@ fi
 if [[ ! -d "$prefix_install" ]]
 then
   echo -e \
-    'WARNING: seems that the install prefix does not exists\n' \
+    'WARNING: It seems that the install prefix does not exist\n' \
     'WARNING: if you continue, the install prefix will be ignore and' \
     'nothing will be removed' \
   >&2
-  read -p 'Proccess anyway ? [yN]' -r valid < /dev/tty
+  read -p 'Proceed anyway ? [yN]' -r valid < /dev/tty
   if [[ "$valid" != 'y' ]]; then
     echo 'Operation aborted o(x_x)o' >&2
     exit 1
@@ -72,7 +72,7 @@ fi
 if [[ ! -x "$prefix_sysroot/bin/sh-elf-vhex-as" ]]
 then
   echo -e \
-    'ERROR: Are you sure to have built sh-elf-vhex ? Seems that the' \
+    'ERROR: Are you sure to have built sh-elf-vhex ? It Seems that the' \
     'sh-elf-vhex-as cannot be found in the sysroot prefix' \
   >&2
   exit 1
@@ -82,7 +82,7 @@ echo 'The script will uninstall the sh-elf-vhex compiler with:'
 echo " - Clone directory:   $prefix_clone"
 echo " - Install directory: $prefix_install"
 echo " - Sysroot directory: $prefix_sysroot"
-read -p 'Process ? [yN]: ' -r valid < /dev/tty
+read -p 'Proceed ? [yN]: ' -r valid < /dev/tty
 if [[ "$valid" != 'y' ]]
 then
   echo 'Operation aborted o(x_x)o'

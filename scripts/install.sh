@@ -106,7 +106,7 @@ echo " - Compliler install at:  $prefix_install"
 if [[ "$has_been_cloned" == 'true' ]]; then
   echo 'Note that the cloned repository will be removed if aborted'
 fi
-read -p 'Process ? [yN]: ' -r valid < /dev/tty
+read -p 'Proceed ? [yN]: ' -r valid < /dev/tty
 
 if [[ "$valid" != 'y' ]]; then
   if [[ "$has_been_cloned" == 'true' ]]; then
