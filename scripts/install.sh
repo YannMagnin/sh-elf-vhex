@@ -155,8 +155,8 @@ done
 if [[ "$cache" == 'false' ]]
 then
   echo "$TAG Cleaning up built files..."
-  rm -rf ../../_build
-  rm -rf ../../_cache
+  rm -rf ../_build
+  rm -rf ../_cache
 fi
 
 echo -e \
