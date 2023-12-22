@@ -1,4 +1,5 @@
-build
-cache
+_build
+_cache
+_sysroot
 commit.txt
 .vxsdk

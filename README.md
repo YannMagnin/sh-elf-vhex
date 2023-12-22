@@ -70,6 +70,20 @@ cd /tmp/sh-elf-vhex || exit 1
 
 It takes about twenty minutes for the build.
 
+Do not forget to add the install prefix (`~/.local/bin`) path to your `PATH`
+environment variable:
+
+> [!WARNING]
+> You must add the absolute path to your PATH environment variable
+
+```bash
+# *unix-like
+export PATH="$PATH:/home/<your_login>/.local/bin"
+
+# macos (darwin-like)
+export PATH="$PATH:/Users/<your_login>/.local/bin"
+```
+
 ## Supported version list
 
 Note that GCC `12.x` will never be supported since many critical bugs have been
