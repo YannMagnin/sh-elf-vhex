@@ -68,4 +68,6 @@ utils_makecmd install-strip
 
 # Indicate that the construction is finished
 
+rm -rf ../build
+rm -rf ../archive
 touch ../.fini
