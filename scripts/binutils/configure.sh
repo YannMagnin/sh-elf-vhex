@@ -165,7 +165,9 @@ cd ../../_build/binutils || exit 1
 # recent versions of bison, which is subject to the following known bug.
 # * https://sourceware.org/bugzilla/show_bug.cgi?id=22941
 # * https://gcc.gnu.org/bugzilla/show_bug.cgi?id=92008
-touch ./archive/intl/plural.c
+# Also note that the new 2.42 version do not have the intl folder, so we
+# silently ignore error
+touch ./archive/intl/plural.c > /dev/null 2>&1
 
 # Apply binutils patches for Vhex
 

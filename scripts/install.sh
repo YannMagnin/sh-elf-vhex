@@ -75,10 +75,10 @@ then
     fi
     echo 'overwrite operation requested, invoke the uninstall script...'
     ./uninstall.sh --force
+    [[ -d "$prefix_clone" ]] && rm -rf "$prefix_clone"
   fi
   if [[ ! -d "$prefix_clone" ]]
   then
-    [[ -d "$prefix_clone" ]] && rm -rf "$prefix_clone"
     echo '<sh-elf-vhex> self-clone repository...'
     {
       git \
