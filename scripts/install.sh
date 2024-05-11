@@ -65,13 +65,18 @@ if [[ "$prefix_clone/scripts" != "$_src" ]]
 then
   if [ -x "$prefix_install/sh-elf-vhex-gcc" ]
   then
-    echo -e \
-      'It seems that the project is already installed :pouce:\n' \
-      '\rIf you really want to reinstall this project use the ' \
-      '"--overwrite" option.'
-    exit 1
+    if [[ "$overwrite" != 'true' ]];
+    then
+      echo -e \
+        'It seems that the project is already installed :pouce:\n' \
+        '\rIf you really want to reinstall this project use the ' \
+        '"--overwrite" option.'
+      exit 1
+    fi
+    echo 'overwrite operation requested, invoke the uninstall script...'
+    ./uninstall.sh --force
   fi
-  if [[ ! -d "$prefix_clone" || "$overwrite" == 'true' ]]
+  if [[ ! -d "$prefix_clone" ]]
   then
     [[ -d "$prefix_clone" ]] && rm -rf "$prefix_clone"
     echo '<sh-elf-vhex> self-clone repository...'

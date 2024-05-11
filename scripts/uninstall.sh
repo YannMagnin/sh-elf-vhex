@@ -17,6 +17,7 @@ Configurations:
       --prefix-sysroot  Sysroot (lib, header, ...) prefix
       --prefix-clone    Clone prefix
       --no-purge        Do not remove the cloned folder
+      --force           Do not request user validation
 EOF
   exit 0
 }
@@ -25,6 +26,7 @@ EOF
 # Parse arguments
 #---
 
+force='false'
 purge='true'
 prefix_install=~/.local/bin
 prefix_sysroot=~/.local/share/sh-elf-vhex/_sysroot
@@ -36,6 +38,7 @@ for arg
     --prefix-install=*) prefix_install=${arg#*=};;
     --prefix-sysroot=*) prefix_sysroot=${arg#*=};;
     --prefix-clone=*)   prefix_clone=${arg#*=};;
+    --force)            force='true';;
     *)
       echo "error: unrecognized argument '$arg', giving up." >&2
       exit 1
@@ -78,15 +81,18 @@ then
   exit 1
 fi
 
-echo 'The script will uninstall the sh-elf-vhex compiler with:'
-echo " - Clone directory:   $prefix_clone"
-echo " - Install directory: $prefix_install"
-echo " - Sysroot directory: $prefix_sysroot"
-read -p 'Proceed ? [yN]: ' -r valid < /dev/tty
-if [[ "$valid" != 'y' ]]
+if [[ "$force" != 'true' ]]
 then
-  echo 'Operation aborted o(x_x)o'
-  exit 1
+  echo 'The script will uninstall the sh-elf-vhex compiler with:'
+  echo " - Clone directory:   $prefix_clone"
+  echo " - Install directory: $prefix_install"
+  echo " - Sysroot directory: $prefix_sysroot"
+  read -p 'Proceed ? [yN]: ' -r valid < /dev/tty
+  if [[ "$valid" != 'y' ]]
+  then
+    echo 'Operation aborted o(x_x)o'
+    exit 1
+  fi
 fi
 
 #---
