@@ -1,4 +1,4 @@
-# sh-elf-vhex - v2.0.0
+# sh-elf-vhex - v2.1.0
 
 Modified GCC for the Vhex kernel projet
 
@@ -6,7 +6,7 @@ Modified GCC for the Vhex kernel projet
 
 This project was born following the discovery of a limitation with GCC on the
 SuperH architecture
-[see on this subject from 2 years ago](
+[see on this subject from few years ago](
 https://gcc.gnu.org/legacy-ml/gcc-help/current/000075.html
 ):
 
