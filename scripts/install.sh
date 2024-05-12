@@ -60,22 +60,28 @@ done
 _src=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd)
 cd "$_src" || exit 1
 
+if [[ "$overwrite" == 'true' ]]
+then
+  echo 'overwrite operation requested, this invoke the uninstall script'
+  read -p 'Proceed ? [yN]: ' -r valid < /dev/tty
+  if [[ "$valid" != 'y' ]]; then
+    echo 'Operation aborted o(x_x)o'
+    exit 1
+  fi
+  ./uninstall.sh --force
+  [[ -d "$prefix_clone" ]] && rm -rf "$prefix_clone"
+fi
+
 has_been_cloned='false'
 if [[ "$prefix_clone/scripts" != "$_src" ]]
 then
   if [ -x "$prefix_install/sh-elf-vhex-gcc" ]
   then
-    if [[ "$overwrite" != 'true' ]];
-    then
-      echo -e \
-        'It seems that the project is already installed :pouce:\n' \
-        '\rIf you really want to reinstall this project use the ' \
-        '"--overwrite" option.'
-      exit 1
-    fi
-    echo 'overwrite operation requested, invoke the uninstall script...'
-    ./uninstall.sh --force
-    [[ -d "$prefix_clone" ]] && rm -rf "$prefix_clone"
+    echo -e \
+      'It seems that the project is already installed :pouce:\n' \
+      '\rIf you really want to reinstall this project use the ' \
+      '"--overwrite" option.'
+    exit 1
   fi
   if [[ ! -d "$prefix_clone" ]]
   then
