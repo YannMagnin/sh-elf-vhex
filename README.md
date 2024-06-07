@@ -88,10 +88,11 @@ export PATH="$PATH:/Users/<your_login>/.local/bin"
 
 ## Supported version list
 
-Note that GCC `12.x` will never be supported since many critical bugs have been
-found for the superh backend
+Note that GCC `12.x` will never be supported since many critical bugs have
+been found for the superh backend
 (https://gcc.gnu.org/bugzilla/show_bug.cgi?id=106609)
 
+- GCC `14.1.0` and binutils `2.42`
 - GCC `13.2.0` and binutils `2.41`
 - GCC `11.2.0` and binutils `2.31`
 

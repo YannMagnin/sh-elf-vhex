@@ -13,6 +13,7 @@ Usage $0 [options...]
 Configurations:
   -h, --help            Display this help
   --cache               Keep the archive of GCC
+  --noconfirm           Skip user interaction
 EOF
   exit 0
 }
@@ -32,6 +33,7 @@ for arg
     --no-cache)         cached='true';;
     --prefix-sysroot=*) prefix_sysroot=${arg#*=};;
     --version=*)        version=${arg#*=};;
+    --noconfirm)        ;;
     *)
       echo "error: unrecognized argument '$arg', giving up." >&2
       exit 1

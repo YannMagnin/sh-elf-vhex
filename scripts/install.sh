@@ -149,15 +149,21 @@ fi
 # Handle GGC/Binutils build
 #---
 
+noconfirm_flag='--noconfirm'
+[[ "$noconfirm" == 'false' ]] && noconfirm_flag=''
 {
-  ./binutils/configure.sh     \
+  ./binutils/configure.sh   \
       --prefix-sysroot="$prefix_sysroot"    \
       --version="$version_binutils"         \
-  && ./binutils/build.sh      \
-  && ./gcc/configure.sh       \
+      "$noconfirm_flag"                     \
+  && ./binutils/build.sh    \
+      "$noconfirm_flag"                     \
+  && ./gcc/configure.sh     \
       --prefix-sysroot="$prefix_sysroot"    \
       --version="$version_gcc"              \
-  && ./gcc/build.sh
+      "$noconfirm_flag"                     \
+  && ./gcc/build.sh         \
+      "$noconfirm_flag"
 } || {
     echo 'Error during installing operations' >&2
     exit 1

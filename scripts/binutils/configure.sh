@@ -16,6 +16,7 @@ Configurations:
       --no-cache        Do not keep the archive of binutils
       --prefix-sysroot  Sysroot (lib, header, ...) prefix
       --version         Binutils version
+      --noconfirm       Skip user interaction
 EOF
   exit 0
 }
@@ -25,6 +26,7 @@ EOF
 #---
 
 cached='true'
+noconfirm='false'
 prefix_sysroot=
 version=
 for arg;
@@ -34,6 +36,7 @@ for arg;
     --prefix-sysroot=*) prefix_sysroot=${arg#*=};;
     --version=*)        version=${arg#*=};;
     --no-cache)         cached='false';;
+    --noconfirm)        noconfirm='true';;
     *)
       echo "error: unrecognized argument '$arg', giving up" >&2
       exit 1
@@ -133,11 +136,16 @@ fi
 
 if [[ -n "$missing" ]]
 then
-  echo -en \
-    "$TAG Based on $pm, some dependencies are missing: $missing\n" \
-    "$TAG Do you want to run '$pm_install $missing' to install "   \
-    'them [nY]? '
-  read -r do_install < /dev/tty
+  echo "$TAG Based on $pm, some dependencies are missing: $missing"
+  if [[ "$noconfirm" == 'false' ]]
+  then
+    echo \
+        "$TAG Do you want to run '$pm_install $missing' to install " \
+        'them [nY]? '
+    read -r do_install < /dev/tty
+  else
+    do_install='y'
+  fi
   if [[ "$do_install" != 'n' ]]
   then
     bash -c "$pm_install $missing"

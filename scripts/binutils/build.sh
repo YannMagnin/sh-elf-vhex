@@ -12,6 +12,7 @@ Usage $0 [options...]
 
 Configurations:
   -h, --help            Display this help
+  --noconfirm           Skip user interaction
 EOF
   exit 0
 }
@@ -22,7 +23,8 @@ EOF
 
 for arg;
   do case "$arg" in
-    --help | -h)    help;;
+    --help | -h) help;;
+    --noconfirm) ;;
     *)
       echo "error: unrecognized argument '$arg', giving up." >&2
       exit 1
