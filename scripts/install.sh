@@ -18,6 +18,7 @@ Configurations:
       --prefix-clone    Clone prefix
       --overwrite       Remove the cloned version if exists and install
       --cache           Keep the build and the sources directory
+      --noconfirm       Skip the user confirmation dialog
 
 Notes:
     This project will automatically install the vxLibc. You can use the
@@ -34,6 +35,7 @@ EOF
 cache='false'
 verbose='false'
 overwrite='false'
+noconfirm='false'
 prefix_install=~/.local/bin
 prefix_sysroot=~/.local/share/sh-elf-vhex/_sysroot
 prefix_clone=~/.local/share/sh-elf-vhex
@@ -47,6 +49,7 @@ for arg; do
     --prefix-install=*) prefix_install=${arg#*=};;
     --prefix-clone=*)   prefix_clone=${arg#*=};;
     --overwrite)        overwrite='true';;
+    --noconfirm)        noconfirm='true';;
     *)
       echo "error: unrecognized argument '$arg', giving up." >&2
       exit 1
@@ -63,10 +66,13 @@ cd "$_src" || exit 1
 if [[ "$overwrite" == 'true' ]]
 then
   echo 'overwrite operation requested, this invoke the uninstall script'
-  read -p 'Proceed ? [yN]: ' -r valid < /dev/tty
-  if [[ "$valid" != 'y' ]]; then
-    echo 'Operation aborted o(x_x)o'
-    exit 1
+  if [[ "$noconfirm" == 'false' ]]
+  then
+    read -p 'Proceed ? [yN]: ' -r valid < /dev/tty
+    if [[ "$valid" != 'y' ]]; then
+      echo 'Operation aborted o(x_x)o'
+      exit 1
+    fi
   fi
   ./uninstall.sh --force
   [[ -d "$prefix_clone" ]] && rm -rf "$prefix_clone"
@@ -117,15 +123,17 @@ echo " - Compliler install at:  $prefix_install"
 if [[ "$has_been_cloned" == 'true' ]]; then
   echo 'Note that the cloned repository will be removed if aborted'
 fi
-read -p 'Proceed ? [yN]: ' -r valid < /dev/tty
-
-if [[ "$valid" != 'y' ]]; then
-  if [[ "$has_been_cloned" == 'true' ]]; then
-    echo 'Removing the cloned repository...'
-    rm -rf "$prefix_clone"
+if [[ "$noconfirm" == 'false' ]]
+then
+  read -p 'Proceed ? [yN]: ' -r valid < /dev/tty
+  if [[ "$valid" != 'y' ]]; then
+    if [[ "$has_been_cloned" == 'true' ]]; then
+      echo 'Removing the cloned repository...'
+      rm -rf "$prefix_clone"
+    fi
+    echo 'Operation aborted o(x_x)o'
+    exit 1
   fi
-  echo 'Operation aborted o(x_x)o'
-  exit 1
 fi
 
 [[ "$verbose" == 'true' ]] && export VERBOSE=1
