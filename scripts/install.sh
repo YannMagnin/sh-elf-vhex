@@ -65,17 +65,24 @@ cd "$_src" || exit 1
 
 if [[ "$overwrite" == 'true' ]]
 then
-  echo 'overwrite operation requested, this invoke the uninstall script'
-  if [[ "$noconfirm" == 'false' ]]
+  if [[ -d "$prefix_clone" ]]
   then
-    read -p 'Proceed ? [yN]: ' -r valid < /dev/tty
-    if [[ "$valid" != 'y' ]]; then
-      echo 'Operation aborted o(x_x)o'
-      exit 1
+    echo 'overwrite operation requested, this invoke the uninstall script'
+    if [[ "$noconfirm" == 'false' ]]
+    then
+      read -p 'Proceed ? [yN]: ' -r valid < /dev/tty
+      if [[ "$valid" != 'y' ]]; then
+        echo 'Operation aborted o(x_x)o'
+        exit 1
+      fi
     fi
+    "$prefix_clone/scripts/uninstall.sh" --force
+    rm -rf "$prefix_clone"
+  else
+      echo \
+          "overwrite operation requested, but the cloned repository " \
+          "'$prefix_clone' is not found"
   fi
-  ./uninstall.sh --force
-  [[ -d "$prefix_clone" ]] && rm -rf "$prefix_clone"
 fi
 
 has_been_cloned='false'
