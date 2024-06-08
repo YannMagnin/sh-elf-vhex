@@ -1,4 +1,4 @@
-# sh-elf-vhex - v2.1.0
+# sh-elf-vhex - v2.2.0
 
 Modified GCC for the Vhex kernel projet
 
