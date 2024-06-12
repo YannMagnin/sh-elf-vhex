@@ -100,11 +100,11 @@ then
   pm='pkg'
   pm_has='dpkg -s'
   pm_install='ASSUME_ALWAYS_YES=yes pkg install'
-elif command -v apt >/dev/null 2>&1
+elif command -v apt-get >/dev/null 2>&1
 then
   deps='cmake libmpfr-dev libmpc-dev libgmp-dev libpng-dev libppl-dev'
-  deps="$deps flex g++ git texinfo xz-utils gcc"
-  pm='apt'
+  deps="$deps flex g++ git texinfo xz-utils gcc bzip2"
+  pm='apt-get'
   pm_has='dpkg -s'
   pm_install='sudo apt install -y'
 elif command -v dnf >/dev/null 2>&1

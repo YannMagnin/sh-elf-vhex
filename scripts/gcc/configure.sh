@@ -23,6 +23,7 @@ EOF
 #---
 
 cached='true'
+noconfirm='false'
 prefix_sysroot=
 version=
 verbose=
@@ -33,7 +34,7 @@ for arg
     --no-cache)         cached='true';;
     --prefix-sysroot=*) prefix_sysroot=${arg#*=};;
     --version=*)        version=${arg#*=};;
-    --noconfirm)        ;;
+    --noconfirm)        noconfirm='true';;
     *)
       echo "error: unrecognized argument '$arg', giving up." >&2
       exit 1
@@ -115,12 +116,14 @@ echo "$TAG install dependencies..."
 cd ./archive || exit 1
 if ! utils_warn_callcmd ./contrib/download_prerequisites
 then
-  echo -en \
-    'The installation of GCC'\''s prerequisites has failed\n' \
-    'Do you want to continue the installation ? [yN]: '
-  read -r valid < /dev/tty
-  if [[ "$valid" != 'y' ]]; then
-    echo 'Operation aborted o(x_x)o'
-    exit 1
+  echo 'The installation of GCC'\''s prerequisites has failed'
+  if [[ "$noconfirm" == 'false' ]]
+  then
+    echo -en 'Do you want to continue the installation ? [yN]: '
+    read -r valid < /dev/tty
+    if [[ "$valid" != 'y' ]]; then
+      echo 'Operation aborted o(x_x)o'
+      exit 1
+    fi
   fi
 fi
