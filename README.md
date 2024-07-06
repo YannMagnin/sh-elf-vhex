@@ -43,7 +43,7 @@ particular GCC.
 * we do not provide a specialized default linker script (for the moment)
 * compilation of the shared libgcc (`t-slibgcc`)
 * compilation of the libgcc in PIC (`t-libgcc-pic`)
-* compilation of the library for emulated floating point numbers (`t-fdpbit`)
+* compilation of the library for emulated floating point numbers (`t-softfp`)
 
 ## Installing
 

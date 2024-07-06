@@ -1441,7 +1441,8 @@ sh*-*-vhex*)
 		t-slibgcc \
 		t-slibgcc-libgcc \
 		t-libgcc-pic \
-		t-fdpbit"
+		t-softfp-sfdf \
+		t-softfp"
 	;;
 sh-wrs-vxworks)
 	tmake_file="$tmake_file sh/t-sh t-crtstuff-pic t-fdpbit"
