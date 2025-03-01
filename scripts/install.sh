@@ -149,25 +149,38 @@ fi
 # Handle GGC/Binutils build
 #---
 
-noconfirm_flag='--noconfirm'
-[[ "$noconfirm" == 'false' ]] && noconfirm_flag=''
+function _fbash()
 {
-  ./binutils/configure.sh   \
+  if [[ "$noconfirm" == 'false' ]]
+  then
+    ./binutils/configure.sh   \
       --prefix-sysroot="$prefix_sysroot"    \
       --version="$version_binutils"         \
-      "$noconfirm_flag"                     \
-  && ./binutils/build.sh    \
-      "$noconfirm_flag"                     \
-  && ./gcc/configure.sh     \
+    && ./binutils/build.sh    \
+    && ./gcc/configure.sh     \
       --prefix-sysroot="$prefix_sysroot"    \
       --version="$version_gcc"              \
-      "$noconfirm_flag"                     \
-  && ./gcc/build.sh         \
-      "$noconfirm_flag"
-} || {
-    echo 'Error during installing operations' >&2
-    exit 1
+    && ./gcc/build.sh
+  else
+    ./binutils/configure.sh   \
+      --prefix-sysroot="$prefix_sysroot"    \
+      --version="$version_binutils"         \
+      --noconfirm                           \
+    && ./binutils/build.sh    \
+      --noconfirm                           \
+    && ./gcc/configure.sh     \
+      --prefix-sysroot="$prefix_sysroot"    \
+      --version="$version_gcc"              \
+      --noconfirm                           \
+    && ./gcc/build.sh         \
+      --noconfirm
+  fi
 }
+_fbash
+if [[ $? != 0 ]]; then
+  echo 'Error during installing operations' >&2
+  exit 1
+fi
 
 #---
 # Handle manual installation to the install path
